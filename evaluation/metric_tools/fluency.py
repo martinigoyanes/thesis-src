@@ -4,9 +4,9 @@ import math
 import torch
 import tqdm
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
-from fairseq.models.roberta import RobertaModel
-from flair.embeddings import FlairEmbeddings
-from fairseq.data.data_utils import collate_tokens
+from tqdm.auto import trange
+
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 
 def calc_flair_ppl(preds, aggregate=True):
@@ -104,3 +104,27 @@ def do_cola_eval(args, preds, soft=False):
         cola_stats.extend(list(1 - prediction_labels))
 
     return np.array(cola_stats)
+
+
+def do_cola_eval_transformers(args, preds, soft=False):
+    def detokenize(x):
+        return x.replace(" .", ".").replace(" ,", ",").replace(" !", "!").replace(" ?", "?").replace(" )",")").replace("( ", "(")  # noqa
+
+    print('Calculating CoLA acceptability stats')
+    path = args.cola_classifier_path
+
+    model = AutoModelForSequenceClassification.from_pretrained(path)
+    tokenizer = AutoTokenizer.from_pretrained(path)
+
+    results = []
+    bs = args.batch_size
+    for i in trange(0, len(preds), bs):
+        batch = [detokenize(t) for t in preds[i: i + bs]]
+        inputs = tokenizer(batch, padding=True, truncation=True, return_tensors='pt').to(model.device)
+        with torch.no_grad():
+            out = torch.softmax(model(**inputs).logits, -1)[:, 0].cpu().numpy()
+            if soft:
+                results.append(out)
+            else:
+                results.append((out > 0.5).astype(int))
+    return np.concatenate(results)

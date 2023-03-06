@@ -7,8 +7,8 @@ def classify_preds(args, preds):
     print('Calculating style of predictions')
     results = []
 
-    tokenizer = RobertaTokenizer.from_pretrained('SkolkovoInstitute/roberta_toxicity_classifier')
-    model = RobertaForSequenceClassification.from_pretrained('SkolkovoInstitute/roberta_toxicity_classifier')
+    tokenizer = RobertaTokenizer.from_pretrained('s-nlp/roberta_toxicity_classifier')
+    model = RobertaForSequenceClassification.from_pretrained('s-nlp/roberta_toxicity_classifier')
 
     for i in tqdm.tqdm(range(0, len(preds), args.batch_size)):
         batch = tokenizer(preds[i:i + args.batch_size], return_tensors='pt', padding=True)

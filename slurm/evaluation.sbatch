@@ -24,19 +24,13 @@ conda activate thesis-src
 
 
 JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/bart-detox/evaluation/${SLURM_JOB_ID}
-PREDS_PATH=
-INPUT_PATH=
+# use references as input
+# INPUT_PATH=/Midgard/home/martinig/thesis-src/data/paradetox/test_toxic_refs.txt
+# use orignial as input
+INPUT_PATH=/Midgard/home/martinig/thesis-src/data/paradetox/test_toxic.txt
+
+BATCH_SIZE=32
 
 export TRANSFORMERS_OFFLINE=1
-python emnlp2021/style_transfer/paraGeDi/gedi_training/gedi_training.py \
---tokenizer_name $TOKENIZER_NAME \
---data_dir $DATA_PATH \
---working_dir "${JOB_PATH}/model" \
---log_dir "${JOB_PATH}/logs" \
---n_epochs $N_EPOCHS \
---max_seq_length $MAX_SEQUENCE_LEN \
---train_batch_size $BATCH_SIZE \
---eval_batch_size $BATCH_SIZE \
---logging_steps $LOGGING_STEPS \
---saving_steps $SAVING_STEPS \
---tensorboard
+python inference.py --batch_size $BATCH_SIZE --out_dir $JOB_PATH
+python evaluation/metric.py  --inputs $INPUT_PATH --preds "$JOB_PATH/preds.txt" --batch_size 32 --out_dir $JOB_PATH

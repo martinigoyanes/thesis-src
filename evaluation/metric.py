@@ -16,15 +16,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', "--inputs", help="path to test sentences", required=True)
     parser.add_argument('-p', "--preds", help="path to predictions of a model", required=True)
+    parser.add_argument('--out_dir', help="path to output results", required=True)
 
-    parser.add_argument("--cola_classifier_path", 
-                       default='models/cola'
-                       )
+    # Use the adapter version to HugginFace transformers from original in FairSeq
+    parser.add_argument("--cola_classifier_path", default='cointegrated/roberta-large-cola-krishna2020')
     parser.add_argument("--wieting_model_path",
-                        default='models/sim.pt'
+                        default='/Midgard/home/martinig/thesis-src/models/wieting/sim.pt'
                         )
     parser.add_argument("--wieting_tokenizer_path",
-                        default='models/sim.sp.30k.model'
+                        default='/Midgard/home/martinig/thesis-src/models/wieting/sim.sp.30k.model'
                         )
 
     parser.add_argument("--batch_size", default=32, type=int)
@@ -65,7 +65,8 @@ if __name__ == "__main__":
     # token_ppl = calc_gpt_ppl(preds)
     # cleanup()
     
-    cola_stats = do_cola_eval(args, preds)
+    # cola_stats = do_cola_eval(args, preds)
+    cola_stats = do_cola_eval_transformers(args, preds)
     cola_acc = sum(cola_stats) / len(preds)
     cleanup()
     
@@ -73,14 +74,10 @@ if __name__ == "__main__":
     # gm = get_gm(args, accuracy, emb_sim, char_ppl)
     joint = get_j(args, accuracy_by_sent, similarity_by_sent, cola_stats, preds)
     
-    # write res to table
-    if not os.path.exists('results.md'):
-        with open('results.md', 'w') as f:
-            f.writelines('| Model | ACC | SIM | FL | J | BLEU |\n')
-            f.writelines('| ----- | --- | --- | -- | - | ---- |\n')
-            
-    with open('results.md', 'a') as res_file:
+    with open(f"{args.out_dir}/results.md", 'a') as res_file:
         name = args.preds.split('/')[-1]
+        res_file.writelines('ACC | SIM | FL | J | BLEU |\n')
+        res_file.writelines('--- | --- | -- | - | ---- |\n')
         # res_file.writelines(f'{name}|{accuracy:.4f}|{emb_sim:.4f}|{avg_sim_by_sent:.4f}|{char_ppl:.4f}|'
         #                     f'{token_ppl:.4f}|{cola_acc:.4f}|{gm:.4f}|{joint:.4f}|{bleu:.4f}|\n')
-        res_file.writelines(f'{name}|{accuracy:.4f}|{avg_sim_by_sent:.4f}|{cola_acc:.4f}|{joint:.4f}|{bleu:.4f}|\n')
+        res_file.writelines(f'{accuracy:.4f}|{avg_sim_by_sent:.4f}|{cola_acc:.4f}|{joint:.4f}|{bleu:.4f}|\n')
