@@ -32,5 +32,5 @@ INPUT_PATH=/Midgard/home/martinig/thesis-src/data/paradetox/test_toxic.txt
 BATCH_SIZE=32
 
 export TRANSFORMERS_OFFLINE=1
-python inference.py --batch_size $BATCH_SIZE --out_dir $JOB_PATH
+python code/inference.py --batch_size $BATCH_SIZE --out_dir $JOB_PATH
 python evaluation/metric.py  --inputs $INPUT_PATH --preds "$JOB_PATH/preds.txt" --batch_size 32 --out_dir $JOB_PATH
