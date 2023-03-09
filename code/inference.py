@@ -1,6 +1,5 @@
 import os
 import pytorch_lightning as pl
-from pytorch_lightning.profilers import SimpleProfiler, AdvancedProfiler
 from data_modules import ParaDetoxDM
 from models import BARTdetox
 
@@ -32,6 +31,11 @@ if __name__ == "__main__":
     # https://stackoverflow.com/questions/62691279/how-to-disable-tokenizers-parallelism-true-false-warning
     # os.environ["TOKENIZERS_PARALLELISM"] = "false"
     # trainer = pl.Trainer.from_argparse_args(args, fast_dev_run=True, deterministic=True, profiler='advanced')
-    trainer = pl.Trainer.from_argparse_args(args, accelerator="gpu", devices=1, default_root_dir=args.out_dir)
+    trainer = pl.Trainer.from_argparse_args(
+        args, 
+        accelerator="auto", 
+        devices=1, 
+        default_root_dir=args.out_dir
+    )
     preds = trainer.predict(model=bart_detox, datamodule=data_module)
     save_preds(preds=preds, out_dir=args.out_dir, tokenizer=data_module.tokenizer)

@@ -24,6 +24,7 @@ conda activate thesis-src
 
 
 JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/bart-detox/evaluation/${SLURM_JOB_ID}
+mkdir -p $JOB_PATH
 # use references as input
 # INPUT_PATH=/Midgard/home/martinig/thesis-src/data/paradetox/test_toxic_refs.txt
 # use orignial as input
