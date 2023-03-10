@@ -1,5 +1,6 @@
 from transformers import BartForConditionalGeneration
-from transformers import OpenAIGPTLMHeadModel, AdamW, get_linear_schedule_with_warmup
+import torch
+from transformers import OpenAIGPTLMHeadModel, get_linear_schedule_with_warmup
 import pytorch_lightning as pl
 
 class BARTdetox(pl.LightningModule):
@@ -62,8 +63,8 @@ class BlindGST(pl.LightningModule):
         return self.model.generate(*args, **kwargs)
 
     def training_step(self, batch, batch_idx):
-        input_ids, lm_labels = batch
-        loss = self(input_ids, lm_labels=lm_labels)
+        input_ids, attention_mask, labels = batch
+        loss = self(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
         self.log("train loss: ", loss, prog_bar = True, logger=True)
         return {'loss':loss}
     
@@ -81,7 +82,7 @@ class BlindGST(pl.LightningModule):
                 "weight_decay": 0.0,
             },
         ]
-        optimizer = AdamW(optimizer_grouped_parameters, lr=self.hparams.learning_rate, eps=self.hparams.adam_epsilon)
+        optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=self.hparams.learning_rate, eps=self.hparams.adam_epsilon)
 
         scheduler = get_linear_schedule_with_warmup(
             optimizer,

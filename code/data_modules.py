@@ -56,14 +56,14 @@ class YelpDM(pl.LightningDataModule):
 
     def prepare_data(self):
         AutoTokenizer.from_pretrained(self.tokenizer_name_or_path, use_fast=True, additional_special_tokens=self.special_tokens)
-        YelpDataset(split='train', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, max_seq_len=self.max_seq_len)
-        # YelpDataset(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, max_seq_len=self.max_seq_len)
-        # YelpDataset(split='test', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
+        YelpDataset(split='train', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, max_seq_len=self.max_seq_len, prepare_data=True)
+        # YelpDataset(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, max_seq_len=self.max_seq_len, prepare_data=True)
+        # YelpDataset(split='test', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, prepare_data=True)
 
     def setup(self, stage: Optional[str]):
         if stage == "fit":
             self.datasets['train'] = YelpDataset(split='train', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
-            self.datasets['dev'] = YelpDataset(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
+            # self.datasets['dev'] = YelpDataset(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
 
     def predict_dataloader(self):
         return DataLoader(self.datasets['predict'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=False)

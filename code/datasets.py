@@ -29,7 +29,7 @@ class ParaDetoxDataset(Dataset):
 
 class YelpDataset(Dataset):
 
-  def __init__(self, split, tokenizer, max_seq_len=None, preprocess_kind: str = None):
+  def __init__(self, split, tokenizer, max_seq_len=None, preprocess_kind: str = None, prepare_data: bool = False):
     super().__init__()
     assert preprocess_kind
     self.preprocess_kind = preprocess_kind
@@ -38,6 +38,7 @@ class YelpDataset(Dataset):
     self.max_seq_len = max_seq_len if max_seq_len else None
     self.data_dir = f'/Midgard/home/martinig/thesis-src/data/yelp/{self.preprocess_kind}'
     self.cache_dir = f'{self.data_dir}/.cache'
+    self.prepare_data = prepare_data
     self.setup()
 
   def setup(self):
@@ -70,8 +71,9 @@ class YelpDataset(Dataset):
       with open(cache_file, 'wb') as f:
         torch.save(obj=self.data, f=f)
 
-    logger.info(f"Loading tokenization from cache [{cache_file}] ...")
-    self.data = torch.load(cache_file)
+    if not self.prepare_data:
+      logger.info(f"Loading tokenization from cache [{cache_file}] ...")
+      self.data = torch.load(cache_file)
     
   def __len__(self):
     return len(self.data['input_ids'])
