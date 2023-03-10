@@ -63,10 +63,25 @@ class BlindGST(pl.LightningModule):
         return self.model.generate(*args, **kwargs)
 
     def training_step(self, batch, batch_idx):
-        input_ids, attention_mask, labels = batch
-        loss = self(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
-        self.log("train loss: ", loss, prog_bar = True, logger=True)
-        return {'loss':loss}
+        output = self(
+            input_ids=batch['input_ids'], 
+            attention_mask=batch['attention_mask'], 
+            labels=batch['labels'], 
+            return_dict=True
+        )
+        self.log("train_loss", output.loss, on_step=True, on_epoch=True, prog_bar = True, logger=True)
+        return {'loss':output.loss}
+    
+    def validation_step(self, batch, batch_idx):
+        output = self(
+            input_ids=batch['input_ids'], 
+            attention_mask=batch['attention_mask'], 
+            labels=batch['labels'], 
+            return_dict=True
+        )
+        self.log("val_loss", output.loss, on_step=True, on_epoch=True, prog_bar = True, logger=True)
+        return {'loss':output.loss}
+
     
     def configure_optimizers(self):
         """Prepare optimizer and schedule (linear warmup and decay)"""

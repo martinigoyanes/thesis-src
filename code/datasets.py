@@ -36,7 +36,8 @@ class YelpDataset(Dataset):
     self.split = split
     self.tokenizer = tokenizer
     self.max_seq_len = max_seq_len if max_seq_len else None
-    self.data_dir = f'/Midgard/home/martinig/thesis-src/data/yelp/{self.preprocess_kind}'
+    # self.data_dir = f'/Midgard/home/martinig/thesis-src/data/yelp/{self.preprocess_kind}'
+    self.data_dir = f'/home/martin/Documents/Education/Master/thesis/project/thesis-src/data/yelp/{self.preprocess_kind}'
     self.cache_dir = f'{self.data_dir}/.cache'
     self.prepare_data = prepare_data
     self.setup()
@@ -48,6 +49,11 @@ class YelpDataset(Dataset):
     if self.split == "train":
         cache_file = f"{self.cache_dir}/sentiment.train.tokenized.pt"
         data_file = f"{self.data_dir}/sentiment.train"
+    
+    if self.split == 'dev':
+        cache_file = f"{self.cache_dir}/sentiment.dev.tokenized.pt"
+        data_file = f"{self.data_dir}/sentiment.dev"
+
 
     if not os.path.exists(cache_file): 
       os.makedirs(self.cache_dir, exist_ok=True)
@@ -55,10 +61,10 @@ class YelpDataset(Dataset):
       with open(data_file, 'r') as f:
           texts = [line.strip() for line in f.readlines()]
 
-      logger.info(f"Tokenizing data from {data_file}...")
+      logger.info(f"Tokenizing {self.split} data from {data_file}...")
       self.data = self.tokenizer(texts, return_tensors='pt', padding=True)
 
-      logger.info(f"Masking labels from {data_file}...")
+      logger.info(f"Masking {self.split} labels from {data_file}...")
       size = self.data.input_ids.size()
       labels = torch.full(size=size, fill_value=-100)
       for i, ids in enumerate(self.data.input_ids):
@@ -67,12 +73,12 @@ class YelpDataset(Dataset):
         labels[i, idx_start:idx_end] = ids[idx_start:idx_end]
       
       self.data['labels'] = labels         
-      logger.info(f"Saving tokenization to cache [{cache_file}] ...")
+      logger.info(f"Saving {self.split} tokenization to cache [{cache_file}] ...")
       with open(cache_file, 'wb') as f:
         torch.save(obj=self.data, f=f)
 
     if not self.prepare_data:
-      logger.info(f"Loading tokenization from cache [{cache_file}] ...")
+      logger.info(f"Loading {self.split} tokenization from cache [{cache_file}] ...")
       self.data = torch.load(cache_file)
     
   def __len__(self):

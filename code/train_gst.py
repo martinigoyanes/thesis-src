@@ -28,20 +28,21 @@ def main(args):
 
     # https://stackoverflow.com/questions/62691279/how-to-disable-tokenizers-parallelism-true-false-warning
     # os.environ["TOKENIZERS_PARALLELISM"] = "false"
-
-    trainer = pl.Trainer(
+    pl.seed_everything(44)
+    trainer = pl.Trainer.from_argparse_args(
         args,
         max_epochs=1,
         accelerator="auto",
         devices=1 if torch.cuda.is_available() else None,  # limiting got iPython runs
-        fast_dev_run=True,
-        deterministic=True,
+        # fast_dev_run=True,
+        # deterministic=True,
+        limit_train_batches=10,
+        limit_val_batches=10,
         # profiler="advanced",
     )
     trainer.fit(model, datamodule=dm)
 
 if __name__ == "__main__":
-    # TODO: Check if tokenizer vocab and model embedding sizes match
     from argparse import  ArgumentParser
 
     # Resolve handler is key to be able to overrid trainer args with model/datamodule specific args
@@ -52,6 +53,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_name", type=str, default="BlindGST", help="BlindGST")
     parser.add_argument("--datamodule_name", type=str, default="YelpDM", help="YelpDM")
     parser.add_argument("--preprocess_kind", type=str, default="bert_best_head_removal", help="Kind of preprocessing of data:\n - bert_best_head_removal")
+    parser.add_argument("--default_root_dir", type=str, default=".", help="Directory to store run logs and ckpts")
 
 
     # THIS LINE IS KEY TO PULL THE MODEL NAME

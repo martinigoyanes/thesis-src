@@ -35,13 +35,13 @@ class YelpDM(pl.LightningDataModule):
         self.tokenizer_name_or_path = tokenizer_name_or_path
         self.max_seq_len = max_seq_len
         self.batch_size = batch_size
-        self.special_tokens = ['<POS>', '<NEG>','<CON_START>','<START>','<END>']
+        self.special_tokens = ['<POS>', '<NEG>','<CON_START>','<START>','<END>', '<PAD>']
         self.datasets = {}
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.tokenizer_name_or_path, 
             use_fast=True, 
             additional_special_tokens=self.special_tokens,
-            pad_token='[PAD]',
+            pad_token='<PAD>',
             eos_token='<END>',
             bos_token='<START>'
         )
@@ -57,17 +57,20 @@ class YelpDM(pl.LightningDataModule):
     def prepare_data(self):
         AutoTokenizer.from_pretrained(self.tokenizer_name_or_path, use_fast=True, additional_special_tokens=self.special_tokens)
         YelpDataset(split='train', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, max_seq_len=self.max_seq_len, prepare_data=True)
-        # YelpDataset(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, max_seq_len=self.max_seq_len, prepare_data=True)
+        YelpDataset(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, max_seq_len=self.max_seq_len, prepare_data=True)
         # YelpDataset(split='test', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, prepare_data=True)
 
     def setup(self, stage: Optional[str]):
         if stage == "fit":
             self.datasets['train'] = YelpDataset(split='train', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
-            # self.datasets['dev'] = YelpDataset(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
+            self.datasets['dev'] = YelpDataset(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
 
     def predict_dataloader(self):
         return DataLoader(self.datasets['predict'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=False)
     
     def train_dataloader(self):
         return DataLoader(self.datasets['train'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=True)
+
+    def val_dataloader(self):
+        return DataLoader(self.datasets['dev'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=False)
     
