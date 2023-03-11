@@ -1,6 +1,7 @@
 from transformers import BartForConditionalGeneration
 import torch
-from transformers import OpenAIGPTLMHeadModel, get_linear_schedule_with_warmup
+# from transformers import OpenAIGPTLMHeadModel, get_linear_schedule_with_warmup
+from pytorch_pretrained_bert import OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIAdam, cached_path
 import pytorch_lightning as pl
 
 class BARTdetox(pl.LightningModule):
@@ -122,3 +123,57 @@ class BlindGST(pl.LightningModule):
         scheduler = {"scheduler": scheduler, "interval": "step", "frequency": 1}
 
         return [optimizer], [scheduler]
+class OriginalBlindGST(pl.LightningModule):
+    def __init__(self, model_name_or_path: str, num_special_tokens: int, batch_size: int, **kwargs):
+        super().__init__()
+        self.save_hyperparameters()
+        self.model_name_or_path = model_name_or_path
+        self.model = OpenAIGPTLMHeadModel.from_pretrained(self.model_name_or_path, num_special_tokens=num_special_tokens)
+        self.batch_size = batch_size
+
+    @staticmethod
+    def add_specific_args(parent_parser):
+        parser = parent_parser.add_argument_group("OriginalBlindGST")
+        parser.add_argument("--model_name_or_path", type=str, default='openai-gpt')
+        parser.add_argument('--max_grad_norm', type=int, default=1)
+        parser.add_argument('--learning_rate', type=float, default=6.25e-5)
+        parser.add_argument('--warmup_proportion', type=float, default=0.002)
+        parser.add_argument('--lr_schedule', type=str, default='warmup_linear')
+        parser.add_argument('--weight_decay', type=float, default=0.01)
+        parser.add_argument('--num_train_epochs', type=int, default=1)
+        return parent_parser
+
+    def forward(self, *args, **kwargs):
+        return self.model(*args, **kwargs)
+    
+    def generate(self, *args, **kwargs):
+        return self.model.generate(*args, **kwargs)
+
+    def training_step(self, batch, batch_idx):
+        loss = self(batch['input_ids'], lm_labels=batch['lm_labels'])
+        self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar = True, logger=True)
+        return {'loss':loss}
+    
+    def validation_step(self, batch, batch_idx):
+        loss = self(batch['input_ids'], lm_labels=batch['lm_labels'])
+        self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar = True, logger=True)
+        return {'loss':loss}
+
+    def configure_optimizers(self):
+        param_optimizer = list(self.model.named_parameters())
+        no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
+        optimizer_grouped_parameters = [
+            {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)], 'weight_decay': 0.01},
+            {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
+        ]
+        # TODO
+        train_data_len = 443259 # len(sentiment.train)
+        num_train_optimization_steps = train_data_len * self.hparams.num_train_epochs // self.batch_size
+        optimizer = OpenAIAdam(optimizer_grouped_parameters,
+                            lr=self.hparams.learning_rate,
+                            warmup=self.hparams.warmup_proportion,
+                            max_grad_norm=self.hparams.max_grad_norm,
+                            weight_decay=self.hparams.weight_decay,
+                            t_total=num_train_optimization_steps)
+        return [optimizer]
+    
