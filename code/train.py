@@ -7,6 +7,8 @@ from models import BlindGST
 
 logger = logging.getLogger(__name__)
 
+# TODO: Save fine-tuned tokenizer and model -> https://github.com/Lightning-AI/lightning/issues/3096
+# TODO: Load fine-tuned tokenizer and model -> 
 
 def main(args):
 
@@ -36,8 +38,8 @@ def main(args):
         devices=1 if torch.cuda.is_available() else None,  # limiting got iPython runs
         # fast_dev_run=True,
         # deterministic=True,
-        limit_train_batches=10,
-        limit_val_batches=10,
+        # limit_train_batches=10,
+        # limit_val_batches=10,
         # profiler="advanced",
     )
     trainer.fit(model, datamodule=dm)

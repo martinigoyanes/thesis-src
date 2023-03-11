@@ -1,0 +1,27 @@
+You have the following GPUs: [6]
+JOB:  364452
+TASK: 
+HOST: rivendell.rpl
+
+Fri Mar 10 13:01:38 2023       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 470.86       Driver Version: 470.86       CUDA Version: 11.4     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA GeForce ...  On   | 00000000:3E:00.0 Off |                  N/A |
+| 27%   26C    P8     3W / 250W |      1MiB / 11019MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+slurmstepd: error: *** JOB 364452 ON rivendell CANCELLED AT 2023-03-10T13:02:12 ***
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.

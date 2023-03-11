@@ -36,12 +36,13 @@ class BARTdetox(pl.LightningModule):
         return preds
 
 class BlindGST(pl.LightningModule):
-    def __init__(self, model_name_or_path: str, num_special_tokens: int, out_dir: str, **kwargs):
+    def __init__(self, model_name_or_path: str, num_special_tokens: int, pad_token_id: int,  out_dir: str, **kwargs):
         super().__init__()
         self.save_hyperparameters()
         self.model_name_or_path = model_name_or_path
         self.model = OpenAIGPTLMHeadModel.from_pretrained(self.model_name_or_path)
         self.model.resize_token_embeddings(num_special_tokens + self.model.config.vocab_size)
+        self.pad_token_id = pad_token_id
         self.out_dir = out_dir
 
     @staticmethod
@@ -53,7 +54,6 @@ class BlindGST(pl.LightningModule):
         parser.add_argument("--adam_epsilon", type=float, default=1e-8, help="Epsilon for Adam optimizer")
         parser.add_argument("--warmup_steps", type=int, default=0, help="Number of steps for linear warmup")
         parser.add_argument("--gradient_clip_val", type=float, default=1.0, help="Maximum norm of gradients")
-        parser.add_argument("--out_dir", type=str, default='.')
         return parent_parser
 
     def forward(self, *args, **kwargs):
@@ -82,6 +82,21 @@ class BlindGST(pl.LightningModule):
         self.log("val_loss", output.loss, on_step=True, on_epoch=True, prog_bar = True, logger=True)
         return {'loss':output.loss}
 
+    def predict_step(self, batch, batch_idx):
+        # https://huggingface.co/blog/how-to-generate
+        preds = self.generate(
+            inputs=batch["input_ids"],
+            attention_mask=batch["attention_mask"],
+            pad_token_id=self.pad_token_id,
+            num_return_sequences=1,
+            do_sample=True,
+            max_length=128,
+            top_k=50,
+            top_p=0.95,
+            temperature=0.7,
+            num_beams=1
+        )
+        return preds
     
     def configure_optimizers(self):
         """Prepare optimizer and schedule (linear warmup and decay)"""
@@ -107,17 +122,3 @@ class BlindGST(pl.LightningModule):
         scheduler = {"scheduler": scheduler, "interval": "step", "frequency": 1}
 
         return [optimizer], [scheduler]
-
-    def predict_step(self, batch, batch_idx):
-        # https://huggingface.co/blog/how-to-generate
-        preds = self.generate(
-            inputs=batch["input_ids"],
-            num_return_sequences=1,
-            do_sample=True,
-            max_length=128,
-            top_k=50,
-            top_p=0.95,
-            temperature=0.7,
-            num_beams=1
-        )
-        return preds

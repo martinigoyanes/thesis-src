@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-#SBATCH --output=jobs/bart-detox/evaluation/%J_slurm.out
-#SBATCH --error=jobs/bart-detox/evaluation/%J_slurm.out
+#SBATCH --output=jobs/gst/training/%J_slurm.out
+#SBATCH --error=jobs/gst/training/%J_slurm.out
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=martinig@kth.se
 #SBATCH --constrain="rivendell"
@@ -26,10 +26,10 @@ conda activate thesis-src
 JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/gst/training/${SLURM_JOB_ID}
 mkdir -p $JOB_PATH
 
-BATCH_SIZE=32
+BATCH_SIZE=8 # from gst paper
 PREPROCESS_KIND=bert_best_head_removal
 MODEL_NAME=BlindGST
 DATAMODULE_NAME=YelpDM
 
 export TRANSFORMERS_OFFLINE=1
-python code/train_gst.py --batch_size $BATCH_SIZE --datamodule_name $DATAMODULE_NAME --model_name $MODEL_NAME --default_root_dir $JOB_PATH --preprocess_kind $PREPROCESS_KIND
+python code/train.py --batch_size $BATCH_SIZE --datamodule_name $DATAMODULE_NAME --model_name $MODEL_NAME --default_root_dir $JOB_PATH --preprocess_kind $PREPROCESS_KIND
