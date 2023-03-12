@@ -138,6 +138,7 @@ class BlindGST(pl.LightningModule):
         scheduler = {"scheduler": scheduler, "interval": "step", "frequency": 1}
 
         return [optimizer], [scheduler]
+
 class OriginalBlindGST(pl.LightningModule):
     def __init__(self, model_name_or_path: str, num_special_tokens: int, batch_size: int, **kwargs):
         super().__init__()
@@ -182,14 +183,14 @@ class OriginalBlindGST(pl.LightningModule):
             {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
         ]
         # TODO
-        train_data_len = 443259 # len(sentiment.train)
-        num_train_optimization_steps = train_data_len * self.hparams.num_train_epochs // self.batch_size
+        # train_data_len = 443259 # len(sentiment.train)
+        # num_train_optimization_steps = train_data_len * self.hparams.num_train_epochs // self.batch_size
         optimizer = OpenAIAdam(optimizer_grouped_parameters,
                             lr=self.hparams.learning_rate,
                             warmup=self.hparams.warmup_proportion,
                             max_grad_norm=self.hparams.max_grad_norm,
                             weight_decay=self.hparams.weight_decay,
-                            t_total=num_train_optimization_steps)
+                            t_total=self.trainer.estimated_stepping_batches)
         return [optimizer]
     
 

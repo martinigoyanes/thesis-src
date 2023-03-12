@@ -4,6 +4,7 @@ from datasets import ParaDetoxDataset
 from datasets import YelpDataset
 from datasets import OriginalYelpDataset2
 from datasets import OriginalYelpDataset
+from datasets import OriginalJigsawDataset
 import pytorch_lightning as pl
 from transformers import AutoTokenizer
 from pytorch_pretrained_bert import OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIAdam, cached_path
@@ -31,6 +32,9 @@ class ParaDetoxDM(pl.LightningDataModule):
         return DataLoader(self.datasets['predict'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=False)
     
 class YelpDM(pl.LightningDataModule):
+    '''
+        Datamodule to train GPT from transformers on Yelp data processed by BERT
+    '''
 
     def __init__(self, tokenizer_name_or_path: str, max_seq_len: int, batch_size: int, preprocess_kind: str = None, **kwargs):
         super().__init__()
@@ -82,7 +86,65 @@ class YelpDM(pl.LightningDataModule):
     def val_dataloader(self):
         return DataLoader(self.datasets['dev'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=False)
     
+
+class OriginalJigsawDM(pl.LightningDataModule):
+    '''
+        Datamodule to train GPT from pytorch_pretrained_bert on Jigsaw data processed by BERT
+    '''
+
+    def __init__(self, tokenizer_name_or_path: str, max_seq_len: int, batch_size: int, preprocess_kind: str = None, **kwargs):
+        super().__init__()
+        assert preprocess_kind
+        self.save_hyperparameters()
+        self.preprocess_kind = preprocess_kind
+        self.tokenizer_name_or_path = tokenizer_name_or_path
+        self.max_seq_len = max_seq_len
+        self.batch_size = batch_size
+        self.special_tokens = ['<NEU>', '<TOX>','<CON_START>','<START>','<END>', '<PAD>']
+        self.datasets = {}
+        self.tokenizer = OpenAIGPTTokenizer.from_pretrained(
+            self.tokenizer_name_or_path, 
+            special_tokens=self.special_tokens,
+        )
+    
+    @staticmethod
+    def add_specific_args(parent_parser):
+        parser = parent_parser.add_argument_group("OriginalJigsawDM")
+        parser.add_argument("--tokenizer_name_or_path", type=str, default='openai-gpt')
+        parser.add_argument("--batch_size", type=int, default=32) # I made this up
+        parser.add_argument("--max_seq_len", type=int, default=128) # I made this one up
+        return parent_parser
+
+    def prepare_data(self):
+        OpenAIGPTTokenizer.from_pretrained(
+            self.tokenizer_name_or_path, 
+            special_tokens=self.special_tokens,
+        )
+        OriginalJigsawDataset(split='train', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, max_seq_len=self.max_seq_len, prepare_data=True)
+        OriginalJigsawDataset(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, max_seq_len=self.max_seq_len, prepare_data=True)
+        OriginalJigsawDataset(split='test', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, prepare_data=True)
+
+    def setup(self, stage: Optional[str]):
+        if stage == "fit":
+            self.datasets['train'] = OriginalJigsawDataset(split='train', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
+            self.datasets['dev'] = OriginalJigsawDataset(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
+        if stage == "predict":
+            self.datasets['test'] = OriginalJigsawDataset(split='test', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
+    
+
+    def predict_dataloader(self):
+        return DataLoader(self.datasets['test'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=False)
+    
+    def train_dataloader(self):
+        return DataLoader(self.datasets['train'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=True)
+
+    def val_dataloader(self):
+        return DataLoader(self.datasets['dev'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=False)
+
 class OriginalYelpDM(pl.LightningDataModule):
+    '''
+        Datamodule to train GPT from pytorch_pretrained_bert on Yelp data processed by BERT
+    '''
 
     def __init__(self, tokenizer_name_or_path: str, max_seq_len: int, batch_size: int, preprocess_kind: str = None, **kwargs):
         super().__init__()
@@ -135,7 +197,7 @@ class OriginalYelpDM(pl.LightningDataModule):
     
 class YelpDM2(pl.LightningDataModule):
     '''
-        Dataset to train, eval and test RoBERTa fine-tuned on the original/raw Yelp data
+        Datamodule to train, eval and test RoBERTa fine-tuned on the original/raw Yelp data
     '''
 
     def __init__(self, tokenizer_name_or_path: str, max_seq_len: int, batch_size: int, preprocess_kind: str = None, **kwargs):

@@ -146,10 +146,10 @@ def main(args):
         # profiler="advanced",
     )
 
-    preds = trainer.predict(model=model, datamodule=dm)
+    # preds = trainer.predict(model=model, datamodule=dm)
     logger.info(f"Will output inference predictions to {dm.hparams.default_root_dir}")
-    # dm.setup(stage='predict')
-    # preds = predict(dm.datasets['test'], beam_width=1, vocab_length=40483, tokenizer=dm.tokenizer, device=model.device, model=model.model)
+    dm.setup(stage='predict')
+    preds = predict(dm.datasets['test'], beam_width=1, vocab_length=40483, tokenizer=dm.tokenizer, device=model.device, model=model.model)
     save_preds(preds=preds, out_dir=dm.hparams.default_root_dir, tokenizer=dm.tokenizer)
 
 if __name__ == "__main__":
