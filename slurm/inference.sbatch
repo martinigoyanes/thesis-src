@@ -24,5 +24,5 @@ conda activate thesis-src
 
 CKPT_PATH=/Midgard/home/martinig/thesis-src/jobs/gst/364600/lightning_logs/version_364600/checkpoints/epoch=0-step=13852.ckpt
 
-# export TRANSFORMERS_OFFLINE=1 # does NOT affect pytorch_bert_pretrained
+export TRANSFORMERS_OFFLINE=1 # does NOT affect pytorch_bert_pretrained
 python code/inference.py --checkpoint_path $CKPT_PATH

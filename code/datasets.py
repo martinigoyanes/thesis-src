@@ -207,3 +207,7 @@ class OriginalYelpDataset(Dataset):
 			'input_ids': self.data['input_ids'][index], 
 			'lm_labels': self.data['lm_labels'][index] 
 		}
+
+
+if __name__ == "__main__":
+	pass

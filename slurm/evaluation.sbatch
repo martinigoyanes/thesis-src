@@ -23,7 +23,7 @@ source "${HOME}/miniconda3/etc/profile.d/conda.sh"
 conda activate thesis-src
 
 
-JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/gst/364584/lightning_logs/version_364584
+JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/gst/364600/lightning_logs/version_364600
 # use references as input
 INPUT_PATH=/Midgard/home/martinig/thesis-src/data/yelp/bert_best_head_removal/reference.0.out
 # use orignial as input
