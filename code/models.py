@@ -1,6 +1,9 @@
 from transformers import BartForConditionalGeneration
 import torch
-# from transformers import OpenAIGPTLMHeadModel, get_linear_schedule_with_warmup
+# from transformers import OpenAIGPTLMHeadModel
+from transformers import get_linear_schedule_with_warmup
+from transformers import get_cosine_schedule_with_warmup
+from transformers import RobertaForSequenceClassification
 from pytorch_pretrained_bert import OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIAdam, cached_path
 import pytorch_lightning as pl
 
@@ -187,3 +190,96 @@ class OriginalBlindGST(pl.LightningModule):
                             t_total=num_train_optimization_steps)
         return [optimizer]
     
+
+class SentimentRoBERTa(pl.LightningModule):
+    def __init__(self, model_name_or_path: str, **kwargs):
+        super().__init__()
+        self.save_hyperparameters()
+        self.model_name_or_path = model_name_or_path
+        self.model = RobertaForSequenceClassification.from_pretrained(self.model_name_or_path, num_labels=1)
+
+    @staticmethod
+    def add_specific_args(parent_parser):
+        parser = parent_parser.add_argument_group("BlindGST")
+        parser.add_argument("--model_name_or_path", type=str, default='roberta-base')
+        parser.add_argument("--weight_decay", type=float, default=0.001, help="Regularization parameter during training")
+        parser.add_argument("--warmup", type=float, default=0.2, help="Percentage of steps to warmup")
+        parser.add_argument("--learning_rate", type=float, default=1.5e-6, help="Learning rate")
+        return parent_parser
+
+    def forward(self, *args, **kwargs):
+        return self.model(*args, **kwargs)
+    
+    def generate(self, *args, **kwargs):
+        return self.model.generate(*args, **kwargs)
+
+    def training_step(self, batch, batch_idx):
+        output = self(
+            input_ids=batch['input_ids'], 
+            attention_mask=batch['attention_mask'], 
+            labels=batch['labels'], 
+            return_dict=True
+        )
+        self.log("train_loss", output.loss, on_step=True, on_epoch=True, prog_bar = True, logger=True)
+        return {'loss':output.loss}
+    
+    def validation_step(self, batch, batch_idx):
+        output = self(
+            input_ids=batch['input_ids'], 
+            attention_mask=batch['attention_mask'], 
+            labels=batch['labels'], 
+            return_dict=True
+        )
+        self.log("val_loss", output.loss, on_step=True, on_epoch=True, prog_bar = True, logger=True)
+        return {'loss':output.loss}
+
+    def predict_step(self, batch, batch_idx):
+        output = self(
+            input_ids=batch['input_ids'], 
+            attention_mask=batch['attention_mask'], 
+            return_dict=True
+        )
+        return output.logits
+    
+    def configure_optimizers(self):
+        import math
+        """Prepare optimizer and schedule (cosine warmup and decay)"""
+        optimizer = torch.optim.AdamW(
+            self.model.parameters(), 
+            lr=self.hparams.learning_rate, 
+            weight_decay=self.hparams.weight_decay
+        )
+        warmup_steps = math.floor(self.trainer.estimated_stepping_batches * self.hparams.warmup)
+        scheduler = get_linear_schedule_with_warmup(
+            optimizer,
+            num_warmup_steps=warmup_steps,
+            num_training_steps=self.trainer.estimated_stepping_batches,
+        )
+
+        return [optimizer], [scheduler]
+
+if __name__ == "__main__":
+    from data_modules import YelpDM2
+
+    dm = YelpDM2(
+        tokenizer_name_or_path='roberta-base',
+        max_seq_len=110,
+        batch_size=32,
+        preprocess_kind='original'
+    )
+    dm.setup(stage="fit")
+
+    model = SentimentRoBERTa(
+        model_name_or_path='roberta-base'
+    )
+
+    batch = dm.datasets['train'][:1]
+
+    output = model(
+        input_ids=batch['input_ids'], 
+        attention_mask=batch['attention_mask'], 
+        labels=batch['labels'], 
+        return_dict=True
+    )
+
+    print(output)

@@ -2,6 +2,7 @@ import os
 from typing import Optional
 from datasets import ParaDetoxDataset
 from datasets import YelpDataset
+from datasets import OriginalYelpDataset2
 from datasets import OriginalYelpDataset
 import pytorch_lightning as pl
 from transformers import AutoTokenizer
@@ -107,7 +108,7 @@ class OriginalYelpDM(pl.LightningDataModule):
         return parent_parser
 
     def prepare_data(self):
-        AutoTokenizer.from_pretrained(
+        OpenAIGPTTokenizer.from_pretrained(
             self.tokenizer_name_or_path, 
             special_tokens=self.special_tokens,
         )
@@ -132,3 +133,63 @@ class OriginalYelpDM(pl.LightningDataModule):
     def val_dataloader(self):
         return DataLoader(self.datasets['dev'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=False)
     
+class YelpDM2(pl.LightningDataModule):
+    '''
+        Dataset to train, eval and test RoBERTa fine-tuned on the original/raw Yelp data
+    '''
+
+    def __init__(self, tokenizer_name_or_path: str, max_seq_len: int, batch_size: int, preprocess_kind: str = None, **kwargs):
+        super().__init__()
+        assert preprocess_kind
+        self.save_hyperparameters()
+        self.preprocess_kind = preprocess_kind
+        self.tokenizer_name_or_path = tokenizer_name_or_path
+        self.max_seq_len = max_seq_len
+        self.batch_size = batch_size
+        self.datasets = {}
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.tokenizer_name_or_path, 
+            use_fast=True, 
+        )
+    
+    @staticmethod
+    def add_specific_args(parent_parser):
+        parser = parent_parser.add_argument_group("YelpDM")
+        parser.add_argument("--tokenizer_name_or_path", type=str, default='roberta-base')
+        parser.add_argument("--batch_size", type=int, default=32) # I made this up
+        parser.add_argument("--max_seq_len", type=int, default=110) # From paper
+        return parent_parser
+
+    def prepare_data(self):
+        AutoTokenizer.from_pretrained(self.tokenizer_name_or_path, use_fast=True)
+        OriginalYelpDataset2(split='train', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, max_seq_len=self.max_seq_len, prepare_data=True)
+        OriginalYelpDataset2(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, max_seq_len=self.max_seq_len, prepare_data=True)
+        OriginalYelpDataset2(split='test', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, prepare_data=True)
+
+    def setup(self, stage: Optional[str]):
+        if stage == "fit":
+            self.datasets['train'] = OriginalYelpDataset2(split='train', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
+            self.datasets['dev'] = OriginalYelpDataset2(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
+        if stage == "predict":
+            self.datasets['test'] = OriginalYelpDataset2(split='test', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
+    
+
+    def predict_dataloader(self):
+        return DataLoader(self.datasets['test'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=False)
+    
+    def train_dataloader(self):
+        return DataLoader(self.datasets['train'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=True)
+
+    def val_dataloader(self):
+        return DataLoader(self.datasets['dev'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=False)
+
+if __name__ == "__main__":
+
+    dm = YelpDM2(
+        tokenizer_name_or_path='roberta-base',
+        max_seq_len=110,
+        batch_size=32,
+        preprocess_kind='original'
+    )
+
+    dm.setup(stage="fit")

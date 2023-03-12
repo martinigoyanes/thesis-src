@@ -134,22 +134,22 @@ def main(args):
     # https://stackoverflow.com/questions/62691279/how-to-disable-tokenizers-parallelism-true-false-warning
     # os.environ["TOKENIZERS_PARALLELISM"] = "false"
     pl.seed_everything(44)
-    # trainer = pl.Trainer.from_argparse_args(
-    #     args,
-    #     max_epochs=1,
-    #     accelerator="auto",
-    #     devices=model.device
-    #     # fast_dev_run=True,
-    #     # deterministic=True,
-    #     # limit_train_batches=10,
-    #     # limit_val_batches=10,
-    #     # profiler="advanced",
-    # )
+    trainer = pl.Trainer.from_argparse_args(
+        args,
+        max_epochs=1,
+        accelerator="auto",
+        devices=model.device
+        # fast_dev_run=True,
+        # deterministic=True,
+        # limit_train_batches=10,
+        # limit_val_batches=10,
+        # profiler="advanced",
+    )
 
-    # preds = trainer.predict(model=model, datamodule=dm)
+    preds = trainer.predict(model=model, datamodule=dm)
     logger.info(f"Will output inference predictions to {dm.hparams.default_root_dir}")
-    dm.setup(stage='predict')
-    preds = predict(dm.datasets['test'], beam_width=1, vocab_length=40483, tokenizer=dm.tokenizer, device=model.device, model=model.model)
+    # dm.setup(stage='predict')
+    # preds = predict(dm.datasets['test'], beam_width=1, vocab_length=40483, tokenizer=dm.tokenizer, device=model.device, model=model.model)
     save_preds(preds=preds, out_dir=dm.hparams.default_root_dir, tokenizer=dm.tokenizer)
 
 if __name__ == "__main__":
