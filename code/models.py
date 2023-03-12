@@ -6,6 +6,8 @@ from transformers import get_cosine_schedule_with_warmup
 from transformers import RobertaForSequenceClassification
 from pytorch_pretrained_bert import OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIAdam, cached_path
 import pytorch_lightning as pl
+import logging
+logger = logging.getLogger(__name__)
 
 class BARTdetox(pl.LightningModule):
     def __init__(self, args):
@@ -196,7 +198,14 @@ class SentimentRoBERTa(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
         self.model_name_or_path = model_name_or_path
-        self.model = RobertaForSequenceClassification.from_pretrained(self.model_name_or_path, num_labels=1)
+        id2label = {0: "NEGATIVE", 1: "POSITIVE"}
+        label2id = {"NEGATIVE": 0, "POSITIVE": 1}
+        self.model = RobertaForSequenceClassification.from_pretrained(
+            self.model_name_or_path, 
+            num_labels=2,
+            id2label=id2label,
+            label2id=label2id
+        )
 
     @staticmethod
     def add_specific_args(parent_parser):
@@ -230,17 +239,49 @@ class SentimentRoBERTa(pl.LightningModule):
             labels=batch['labels'], 
             return_dict=True
         )
+        probs = torch.sigmoid(output.logits)
+        preds = torch.argmax(probs, dim=1)
         self.log("val_loss", output.loss, on_step=True, on_epoch=True, prog_bar = True, logger=True)
-        return {'loss':output.loss}
+        return {'loss': output.loss, 'preds': preds, 'labels': batch['labels']}
 
-    def predict_step(self, batch, batch_idx):
+    def validation_epoch_end(self, outputs):
+        preds, labels = [], []
+        for out in outputs:
+            preds += out['preds'].tolist()
+            labels += out['labels'].tolist()
+
+        from sklearn.metrics import precision_recall_fscore_support
+        precision, recall, fscore, _ = precision_recall_fscore_support(y_true=labels, y_pred=preds, average='binary')
+        self.log("val_precision", precision, on_epoch=True, prog_bar = True, logger=True)
+        self.log("val_recall", recall, on_epoch=True, prog_bar = True, logger=True)
+        self.log("val_fscore", fscore, on_epoch=True, prog_bar = True, logger=True)
+
+    def test_step(self, batch, batch_idx):
         output = self(
             input_ids=batch['input_ids'], 
             attention_mask=batch['attention_mask'], 
+            labels=batch['labels'], 
             return_dict=True
         )
-        return output.logits
+        probs = torch.sigmoid(output.logits)
+        preds = torch.argmax(probs, dim=1)
+        self.log("test_loss", output.loss, on_step=True, on_epoch=True, prog_bar = True, logger=True)
+        return {'loss': output.loss, 'preds': preds, 'labels': batch['labels']}
     
+    def test_epoch_end(self, outputs):
+        preds, labels = [], []
+        for out in outputs:
+            preds += out['preds'].tolist()
+            labels += out['labels'].tolist()
+        
+        from sklearn.metrics import precision_recall_fscore_support
+        precision, recall, fscore, _ = precision_recall_fscore_support(y_true=labels, y_pred=preds, average='binary')
+        self.log("test_precision", precision, on_epoch=True, prog_bar = True, logger=True)
+        self.log("test_recall", recall, on_epoch=True, prog_bar = True, logger=True)
+        self.log("test_fscore", fscore, on_epoch=True, prog_bar = True, logger=True)
+        self._save_results(precision, recall, fscore)
+        self._save_preds(preds, labels)
+
     def configure_optimizers(self):
         import math
         """Prepare optimizer and schedule (cosine warmup and decay)"""
@@ -257,6 +298,23 @@ class SentimentRoBERTa(pl.LightningModule):
         )
 
         return [optimizer], [scheduler]
+        
+    def _save_results(self, precision, recall, fscore):
+        out_dir = self.trainer.default_root_dir
+        logger.info(f"Writint results to {out_dir}") 
+        with open(f"{out_dir}/results.md", 'a') as res_file:
+            res_file.writelines('PRECISION | RECALL | FSCORE \n')
+            res_file.writelines('--------- | ------ | ------ \n')
+            res_file.writelines(f'{precision:.4f}|{recall:.4f}|{fscore:.4f}\n')
+
+    def _save_preds(self, preds, labels):
+        out_dir = self.trainer.default_root_dir
+        logger.info(f"Writint preds to {out_dir}") 
+        with open(f"{out_dir}/preds.txt", 'a') as f:
+            preds_txt = "Preds: " + " ".join(str(p) for p in preds) + "\n"
+            labels_txt = "Labels: " + " ".join(str(l) for l in labels) + "\n"
+            f.write(preds_txt)
+            f.write(labels_txt)
 
 if __name__ == "__main__":
     from data_modules import YelpDM2
@@ -273,7 +331,7 @@ if __name__ == "__main__":
         model_name_or_path='roberta-base'
     )
 
-    batch = dm.datasets['train'][:1]
+    batch = dm.datasets['train'][:5]
 
     output = model(
         input_ids=batch['input_ids'], 
@@ -282,4 +340,10 @@ if __name__ == "__main__":
         return_dict=True
     )
 
-    print(output)
+    probs = torch.sigmoid(output.logits)
+    preds = torch.argmax(probs, dim=1)
+
+    from sklearn.metrics import precision_recall_fscore_support
+    precision, recall, fscore, support = precision_recall_fscore_support(y_true=batch['labels'], y_pred=preds, average='binary')
+
+    print(precision)

@@ -221,8 +221,8 @@ class OriginalYelpDataset2(Dataset):
         self.split = split
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len if max_seq_len else None
-        self.data_dir = f'/Midgard/home/martinig/thesis-src/data/yelp/{self.preprocess_kind}'
-        # self.data_dir = f'/home/martin/Documents/Education/Master/thesis/project/thesis-src/data/yelp/{self.preprocess_kind}'
+        # self.data_dir = f'/Midgard/home/martinig/thesis-src/data/yelp/{self.preprocess_kind}'
+        self.data_dir = f'/home/martin/Documents/Education/Master/thesis/project/thesis-src/data/yelp/{self.preprocess_kind}'
         self.cache_dir = f'{self.data_dir}/.cache'
         self.prepare_data = prepare_data
         self._setup()
@@ -241,8 +241,8 @@ class OriginalYelpDataset2(Dataset):
         if create_labels:
             logger.info(f"Masking {self.split} labels from {data_file_0} and {data_file_1} ...")
             num_samples_0, num_samples_1 = len(texts_0), len(texts_1)
-            labels_0 = torch.zeros(size=(num_samples_0,))
-            labels_1 = torch.full(size=(num_samples_1,), fill_value=1)
+            labels_0 = torch.zeros(size=(num_samples_0,), dtype= torch.long)
+            labels_1 = torch.full(size=(num_samples_1,), fill_value=1, dtype=torch.long)
             self.data['labels'] = torch.cat((labels_0, labels_1))
 
         logger.info(f"Saving {self.split} tokenization to cache [{cache_file}] ...")
@@ -268,24 +268,16 @@ class OriginalYelpDataset2(Dataset):
 
         os.makedirs(self.cache_dir, exist_ok=True)
         if not os.path.exists(cache_file): 
-            self._prepare_data(cache_file=cache_file, data_file_0=data_file_0, data_file_1=data_file_1, create_labels=(self.split in ['train', 'dev']))
+            self._prepare_data(cache_file=cache_file, data_file_0=data_file_0, data_file_1=data_file_1, create_labels=True)
 
         if not self.prepare_data:
             logger.info(f"Loading {self.split} tokenization from cache [{cache_file}] ...")
             self.data = torch.load(cache_file)
         
     def __len__(self):
-        if self.split == "test": 
-            return len(self.data)
         return len(self.data['input_ids'])
 
     def __getitem__(self, index):
-        if self.split == 'test':
-            return {
-                'input_ids': self.data['input_ids'][index], 
-                'attention_mask': self.data['attention_mask'][index],
-            }
-        
         return {
             'input_ids': self.data['input_ids'][index], 
             'attention_mask': self.data['attention_mask'][index],

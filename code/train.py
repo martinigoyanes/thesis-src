@@ -59,11 +59,20 @@ def main(args):
         devices=1 if torch.cuda.is_available() else None,  # limiting got iPython runs
         # fast_dev_run=True,
         # deterministic=True,
-        # limit_train_batches=10,
+        # limit_train_batches=100,
         # limit_val_batches=10,
         # profiler="advanced",
     )
     trainer.fit(model, datamodule=dm)
+
+    # Check if model has a test_step defined
+    if callable(getattr(model, "test_step", None)):
+        logger.info(f"Will test model {model.hparams.model_name}")
+        trainer.test(model, datamodule=dm)
+    else:
+        logger.info(f"Will NOT test model {model.hparams.model_name}")
+
+
 
 if __name__ == "__main__":
     from argparse import  ArgumentParser

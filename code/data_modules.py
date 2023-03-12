@@ -172,9 +172,11 @@ class YelpDM2(pl.LightningDataModule):
             self.datasets['dev'] = OriginalYelpDataset2(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
         if stage == "predict":
             self.datasets['test'] = OriginalYelpDataset2(split='test', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
+        if stage == "test":
+            self.datasets['test'] = OriginalYelpDataset2(split='test', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
     
 
-    def predict_dataloader(self):
+    def test_dataloader(self):
         return DataLoader(self.datasets['test'], batch_size = self.batch_size, num_workers=os.cpu_count(), shuffle=False)
     
     def train_dataloader(self):

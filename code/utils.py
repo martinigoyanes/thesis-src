@@ -2,14 +2,20 @@ import os
 from pytorch_lightning.callbacks import ModelCheckpoint
 from fsspec.core import url_to_fs
 import pytorch_lightning as pl
+import logging 
+
+logger = logging.getLogger(__name__)
 
 class HfModelCheckpoint(ModelCheckpoint):
 	def _save_checkpoint(self, trainer: "pl.Trainer", filepath: str) -> None:
 		super()._save_checkpoint(trainer, filepath)
-		hf_save_dir = filepath+".dir"
+		dir_name = "/".join(filepath.split('/')[:-1])
+		logger.info(f"Saving model and tokenizer in {dir_name}...")
+		model_path = f"{dir_name}/model"
+		tokenizer_path = f"{dir_name}/tokenizer"
 		if trainer.is_global_zero:
-			# trainer.lightning_module.model.save_pretrained(hf_save_dir)
-			# trainer.datamodule.tokenizer.save_pretrained(hf_save_dir)
+			trainer.lightning_module.model.save_pretrained(model_path)
+			trainer.datamodule.tokenizer.save_pretrained(tokenizer_path)
 			pass
 	
 	# https://github.com/Lightning-AI/lightning/pull/16067
@@ -26,10 +32,6 @@ def split_refs(test_file, out_dir):
 	Takes in test file containing source and target and splits into 2 files, 
 	one with input for the model and other with expected output
 	'''
-	code2style = {
-		0: '<NEG>',
-		1: '<POS>'
-	}
 	with open(test_file, 'r') as f:
 		lines = [line.strip() for line in f.readlines()]
 
