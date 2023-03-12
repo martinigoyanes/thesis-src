@@ -130,8 +130,8 @@ class OriginalJigsawDataset(Dataset):
         self.split = split
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len if max_seq_len else None
-        self.data_dir = f'/Midgard/home/martinig/thesis-src/data/jigsaw/{self.preprocess_kind}'
-        # self.data_dir = f'/home/martin/Documents/Education/Master/thesis/project/thesis-src/data/yelp/{self.preprocess_kind}'
+        # self.data_dir = f'/Midgard/home/martinig/thesis-src/data/jigsaw/{self.preprocess_kind}'
+        self.data_dir = f'/home/martin/Documents/Education/Master/thesis/project/thesis-src/data/jigsaw/{self.preprocess_kind}'
         self.cache_dir = f'{self.data_dir}/.cache'
         self.prepare_data = prepare_data
         self._setup()
@@ -186,7 +186,7 @@ class OriginalJigsawDataset(Dataset):
             data_file = f"{self.data_dir}/dev"
 
         if self.split == 'test':
-            data_file = f"{self.data_dir}/reference.toxic.in"
+            data_file = f"{self.data_dir}/reference.neutral.in"
             with open(data_file, 'r') as f:
                     self.data = [line.strip() for line in f.readlines()]
             return
@@ -386,17 +386,19 @@ class OriginalYelpDataset2(Dataset):
         }
 
 if __name__ == "__main__":
-    from transformers import AutoTokenizer
-    tokenizer = AutoTokenizer.from_pretrained(
-        'roberta-base', 
-        use_fast=True, 
+    from pytorch_pretrained_bert import OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIAdam, cached_path
+    special_tokens = ['<POS>', '<NEG>','<CON_START>','<START>','<END>', '<PAD>']
+    datasets = {}
+    tokenizer = OpenAIGPTTokenizer.from_pretrained(
+        'openai-gpt', 
+        special_tokens=special_tokens,
     )
-    dataset = OriginalYelpDataset2(
+    dataset = OriginalJigsawDataset(
         split='train', 
         tokenizer=tokenizer, 
-        preprocess_kind='original', 
-        max_seq_len=110, 
-        # prepare_data=True
+        preprocess_kind='bert_best_head_removal', 
+        max_seq_len=128, 
+        prepare_data=True
     )
 
     print(dataset.__getitem__(0))

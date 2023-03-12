@@ -37,7 +37,9 @@ def split_refs(test_file, out_dir):
 	with open(test_file, 'r') as f:
 		lines = [line.strip() for line in f.readlines()]
 
-	src_style = int(test_file[-1])
+	# get source style
+	src_style = test_file.split("/")[-1].split(".")[-1]
+	# src_style = int(test_file[-1])
 	ref_in_f, ref_out_f = f'{out_dir}/reference.{src_style}.in', f'{out_dir}/reference.{src_style}.out'
 
 	if os.path.exists(ref_in_f) or os.path.exists(ref_out_f):
@@ -61,7 +63,8 @@ def split_refs(test_file, out_dir):
 			f.write(out_text)
 
 if __name__ == "__main__":
-	out_dir = '/Midgard/home/martinig/thesis-src/data/yelp/bert_best_head_removal'
+	out_dir = '/home/martin/Documents/Education/Master/thesis/project/thesis-src/data/jigsaw/bert_best_head_removal'
 
-	test_file = '/Midgard/home/martinig/thesis-src/data/yelp/bert_best_head_removal/sentiment.test.0'
+	test_file = '/home/martin/Documents/Education/Master/thesis/project/thesis-src/data/jigsaw/bert_best_head_removal/test.neutral'
+
 	split_refs(test_file=test_file, out_dir=out_dir)
