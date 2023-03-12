@@ -211,9 +211,11 @@ class SentimentRoBERTa(pl.LightningModule):
     def add_specific_args(parent_parser):
         parser = parent_parser.add_argument_group("BlindGST")
         parser.add_argument("--model_name_or_path", type=str, default='roberta-base')
-        parser.add_argument("--weight_decay", type=float, default=0.001, help="Regularization parameter during training")
-        parser.add_argument("--warmup", type=float, default=0.2, help="Percentage of steps to warmup")
-        parser.add_argument("--learning_rate", type=float, default=1.5e-6, help="Learning rate")
+        parser.add_argument("--weight_decay", type=float, default=0., help="Regularization parameter during training")
+        parser.add_argument("--learning_rate", type=float, default=1e-5, help="Learning rate")
+        parser.add_argument("--adam_epsilon", type=float, default=1e-8, help="Epsilon for Adam optimizer")
+        parser.add_argument("--warmup_steps", type=int, default=100, help="Number of steps for linear warmup")
+        parser.add_argument("--gradient_clip_val", type=float, default=1.0, help="Maximum norm of gradients")
         return parent_parser
 
     def forward(self, *args, **kwargs):
@@ -283,19 +285,27 @@ class SentimentRoBERTa(pl.LightningModule):
         self._save_preds(preds, labels)
 
     def configure_optimizers(self):
-        import math
-        """Prepare optimizer and schedule (cosine warmup and decay)"""
-        optimizer = torch.optim.AdamW(
-            self.model.parameters(), 
-            lr=self.hparams.learning_rate, 
-            weight_decay=self.hparams.weight_decay
-        )
-        warmup_steps = math.floor(self.trainer.estimated_stepping_batches * self.hparams.warmup)
+        """Prepare optimizer and schedule (linear warmup and decay)"""
+        model = self.model
+        no_decay = ["bias", "LayerNorm.weight"]
+        optimizer_grouped_parameters = [
+            {
+                "params": [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)],
+                "weight_decay": self.hparams.weight_decay,
+            },
+            {
+                "params": [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)],
+                "weight_decay": 0.0,
+            },
+        ]
+        optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=self.hparams.learning_rate, eps=self.hparams.adam_epsilon)
+
         scheduler = get_linear_schedule_with_warmup(
             optimizer,
-            num_warmup_steps=warmup_steps,
+            num_warmup_steps=self.hparams.warmup_steps,
             num_training_steps=self.trainer.estimated_stepping_batches,
         )
+        scheduler = {"scheduler": scheduler, "interval": "step", "frequency": 1}
 
         return [optimizer], [scheduler]
         

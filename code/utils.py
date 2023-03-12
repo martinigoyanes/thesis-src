@@ -9,14 +9,16 @@ logger = logging.getLogger(__name__)
 class HfModelCheckpoint(ModelCheckpoint):
 	def _save_checkpoint(self, trainer: "pl.Trainer", filepath: str) -> None:
 		super()._save_checkpoint(trainer, filepath)
-		dir_name = "/".join(filepath.split('/')[:-1])
-		logger.info(f"Saving model and tokenizer in {dir_name}...")
-		model_path = f"{dir_name}/model"
-		tokenizer_path = f"{dir_name}/tokenizer"
-		if trainer.is_global_zero:
-			trainer.lightning_module.model.save_pretrained(model_path)
-			trainer.datamodule.tokenizer.save_pretrained(tokenizer_path)
-			pass
+		model = trainer.lightning_module.model
+		tokenizer = trainer.datamodule.tokenizer
+		if getattr(model, "save_pretrained", None) and getattr(tokenizer, "save_pretrained", None):
+			dir_name = "/".join(filepath.split('/')[:-1])
+			logger.info(f"Saving model and tokenizer in {dir_name}...")
+			model_path = f"{dir_name}/model"
+			tokenizer_path = f"{dir_name}/tokenizer"
+			if trainer.is_global_zero:
+				model.save_pretrained(model_path)
+				tokenizer.save_pretrained(tokenizer_path)
 	
 	# https://github.com/Lightning-AI/lightning/pull/16067
 	def _remove_checkpoint(self, trainer: "pl.Trainer", filepath: str) -> None:

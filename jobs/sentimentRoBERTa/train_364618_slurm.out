@@ -1,0 +1,71 @@
+You have the following GPUs: [0]
+JOB:  364618
+TASK: 
+HOST: arwen
+
+Sun Mar 12 17:42:29 2023       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 525.85.05    Driver Version: 525.85.05    CUDA Version: 12.0     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA GeForce ...  On   | 00000000:39:00.0 Off |                  N/A |
+| 30%   25C    P8    25W / 320W |      1MiB / 10240MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaForSequenceClassification: ['lm_head.dense.bias', 'lm_head.layer_norm.weight', 'lm_head.bias', 'lm_head.layer_norm.bias', 'lm_head.dense.weight', 'roberta.pooler.dense.bias', 'lm_head.decoder.weight', 'roberta.pooler.dense.weight']
+- This IS expected if you are initializing RobertaForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaForSequenceClassification were not initialized from the model checkpoint at roberta-base and are newly initialized: ['classifier.out_proj.weight', 'classifier.out_proj.bias', 'classifier.dense.weight', 'classifier.dense.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[rank: 0] Global seed set to 44
+/Midgard/home/martinig/miniconda3/envs/thesis-src/lib/python3.8/site-packages/lightning_fabric/plugins/environments/slurm.py:166: PossibleUserWarning: The `srun` command is available on your system but is not used. HINT: If your intention is to run Lightning on SLURM, prepend your python command with `srun` like so: srun python code/train.py --batch_size 32 --datamodule_name Yelp ...
+  rank_zero_warn(
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+Better speed can be achieved with apex installed from https://www.github.com/nvidia/apex.
+Traceback (most recent call last):
+  File "code/train.py", line 117, in <module>
+    main(args)
+  File "code/train.py", line 66, in main
+    trainer.fit(model, datamodule=dm)
+  File "/Midgard/home/martinig/miniconda3/envs/thesis-src/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 608, in fit
+    call._call_and_handle_interrupt(
+  File "/Midgard/home/martinig/miniconda3/envs/thesis-src/lib/python3.8/site-packages/pytorch_lightning/trainer/call.py", line 38, in _call_and_handle_interrupt
+    return trainer_fn(*args, **kwargs)
+  File "/Midgard/home/martinig/miniconda3/envs/thesis-src/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 650, in _fit_impl
+    self._run(model, ckpt_path=self.ckpt_path)
+  File "/Midgard/home/martinig/miniconda3/envs/thesis-src/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 1042, in _run
+    self._data_connector.prepare_data()
+  File "/Midgard/home/martinig/miniconda3/envs/thesis-src/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/data_connector.py", line 109, in prepare_data
+    self.trainer._call_lightning_datamodule_hook("prepare_data")
+  File "/Midgard/home/martinig/miniconda3/envs/thesis-src/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 1375, in _call_lightning_datamodule_hook
+    return fn(*args, **kwargs)
+  File "/Midgard/home/martinig/thesis-src/code/data_modules.py", line 165, in prepare_data
+    OriginalYelpDataset2(split='train', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind, max_seq_len=self.max_seq_len, prepare_data=True)
+  File "/Midgard/home/martinig/thesis-src/code/datasets.py", line 228, in __init__
+    self._setup()
+  File "/Midgard/home/martinig/thesis-src/code/datasets.py", line 269, in _setup
+    os.makedirs(self.cache_dir, exist_ok=True)
+  File "/Midgard/home/martinig/miniconda3/envs/thesis-src/lib/python3.8/os.py", line 213, in makedirs
+    makedirs(head, exist_ok=exist_ok)
+  File "/Midgard/home/martinig/miniconda3/envs/thesis-src/lib/python3.8/os.py", line 213, in makedirs
+    makedirs(head, exist_ok=exist_ok)
+  File "/Midgard/home/martinig/miniconda3/envs/thesis-src/lib/python3.8/os.py", line 213, in makedirs
+    makedirs(head, exist_ok=exist_ok)
+  [Previous line repeated 7 more times]
+  File "/Midgard/home/martinig/miniconda3/envs/thesis-src/lib/python3.8/os.py", line 223, in makedirs
+    mkdir(name, mode)
+PermissionError: [Errno 13] Permission denied: '/home/martin'

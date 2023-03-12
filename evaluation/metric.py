@@ -43,10 +43,9 @@ if __name__ == "__main__":
         preds = preds_file.readlines()
         
     # accuracy of style transfer
-    # accuracy_by_sent = classify_preds(args, preds)
-    accuracy_by_sent = 1
-    # accuracy = np.mean(accuracy_by_sent)
-    # cleanup()
+    accuracy_by_sent = classify_preds(args, preds, task=args.task_name)
+    accuracy = np.mean(accuracy_by_sent)
+    cleanup()
     
     # similarity
     bleu = calc_bleu(inputs, preds)
@@ -73,7 +72,7 @@ if __name__ == "__main__":
     
     # count metrics
     # gm = get_gm(args, accuracy, emb_sim, char_ppl)
-    joint = get_j(args, accuracy_by_sent, similarity_by_sent, cola_stats, preds)
+    joint = get_j(args, accuracy, similarity_by_sent, cola_stats, preds)
     
     with open(f"{args.out_dir}/results.md", 'a') as res_file:
         name = args.preds.split('/')[-1]
@@ -81,4 +80,4 @@ if __name__ == "__main__":
         res_file.writelines('--- | --- | -- | - | ---- |\n')
         # res_file.writelines(f'{name}|{accuracy:.4f}|{emb_sim:.4f}|{avg_sim_by_sent:.4f}|{char_ppl:.4f}|'
         #                     f'{token_ppl:.4f}|{cola_acc:.4f}|{gm:.4f}|{joint:.4f}|{bleu:.4f}|\n')
-        res_file.writelines(f'{accuracy_by_sent:.4f}|{avg_sim_by_sent:.4f}|{cola_acc:.4f}|{joint:.4f}|{bleu:.4f}|\n')
+        res_file.writelines(f'{accuracy:.4f}|{avg_sim_by_sent:.4f}|{cola_acc:.4f}|{joint:.4f}|{bleu:.4f}|\n')

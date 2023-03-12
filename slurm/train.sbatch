@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-#SBATCH --output=jobs/gst/train_%J_slurm.out
-#SBATCH --error=jobs/gst/train_%J_slurm.out
+#SBATCH --output=jobs/sentimentRoBERTa/train_%J_slurm.out
+#SBATCH --error=jobs/sentimentRoBERTa/train_%J_slurm.out
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=martinig@kth.se
 #SBATCH --constrain="arwen"
@@ -23,14 +23,15 @@ source "${HOME}/miniconda3/etc/profile.d/conda.sh"
 conda activate thesis-src
 
 
-JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/gst/${SLURM_JOB_ID}
+JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/sentimentRoBERTa/${SLURM_JOB_ID}
 mkdir -p $JOB_PATH
 
 BATCH_SIZE=32 # from gst paper
-ACCUMULATE_GRAD_BATCHES=1 # makes batchsize be 32
+ACCUMULATE_GRAD_BATCHES=8 # makes batchsize be 256
 PREPROCESS_KIND=original
 MODEL_NAME=SentimentRoBERTa
 DATAMODULE_NAME=YelpDM2
+MAX_EPOCHS=2
 
 ##### ARE YOU SURE TO TRAIN ON FULL DATASET ??? ######
 # TRAIN_DATA_PERCENT=0.3
@@ -38,4 +39,4 @@ TRAIN_DATA_PERCENT=1.0
 ##### ARE YOU SURE TO TRAIN ON FULL DATASET ??? ######
 
 export TRANSFORMERS_OFFLINE=1
-python code/train.py --batch_size $BATCH_SIZE --datamodule_name $DATAMODULE_NAME --model_name $MODEL_NAME --default_root_dir $JOB_PATH --preprocess_kind $PREPROCESS_KIND --limit_train_batches $TRAIN_DATA_PERCENT --accumulate_grad_batches $ACCUMULATE_GRAD_BATCHES
+python code/train.py --batch_size $BATCH_SIZE --datamodule_name $DATAMODULE_NAME --model_name $MODEL_NAME --default_root_dir $JOB_PATH --preprocess_kind $PREPROCESS_KIND --limit_train_batches $TRAIN_DATA_PERCENT --accumulate_grad_batches $ACCUMULATE_GRAD_BATCHES --max_epochs $MAX_EPOCHS

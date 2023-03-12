@@ -54,7 +54,6 @@ def main(args):
     trainer = pl.Trainer.from_argparse_args(
         args,
         callbacks=[checkpoint_callback],
-        max_epochs=1,
         accelerator="auto",
         devices=1 if torch.cuda.is_available() else None,  # limiting got iPython runs
         # fast_dev_run=True,
