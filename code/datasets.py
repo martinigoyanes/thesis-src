@@ -125,8 +125,8 @@ class OriginalYelpDataset(Dataset):
 		self.split = split
 		self.tokenizer = tokenizer
 		self.max_seq_len = max_seq_len if max_seq_len else None
-		# self.data_dir = f'/Midgard/home/martinig/thesis-src/data/yelp/{self.preprocess_kind}'
-		self.data_dir = f'/home/martin/Documents/Education/Master/thesis/project/thesis-src/data/yelp/{self.preprocess_kind}'
+		self.data_dir = f'/Midgard/home/martinig/thesis-src/data/yelp/{self.preprocess_kind}'
+		# self.data_dir = f'/home/martin/Documents/Education/Master/thesis/project/thesis-src/data/yelp/{self.preprocess_kind}'
 		self.cache_dir = f'{self.data_dir}/.cache'
 		self.prepare_data = prepare_data
 		self._setup()
@@ -181,7 +181,7 @@ class OriginalYelpDataset(Dataset):
 			data_file = f"{self.data_dir}/sentiment.dev"
 
 		if self.split == 'test':
-			data_file = f"{self.data_dir}/reference.0"
+			data_file = f"{self.data_dir}/reference.0.in"
 			with open(data_file, 'r') as f:
 					self.data = [line.strip() for line in f.readlines()]
 			return

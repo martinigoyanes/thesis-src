@@ -1,0 +1,282 @@
+You have the following GPUs: [0]
+JOB:  364601
+TASK: 
+HOST: arwen
+
+Sun Mar 12 09:11:47 2023       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 525.85.05    Driver Version: 525.85.05    CUDA Version: 12.0     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA GeForce ...  On   | 00000000:39:00.0 Off |                  N/A |
+| 30%   26C    P8    25W / 320W |      1MiB / 10240MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+03/12/2023 09:12:19 - INFO - pytorch_pretrained_bert.tokenization_openai -   loading vocabulary file openai-gpt/vocab.json
+03/12/2023 09:12:19 - INFO - pytorch_pretrained_bert.tokenization_openai -   loading merges file openai-gpt/merges.txt
+03/12/2023 09:12:19 - WARNING - pytorch_pretrained_bert.tokenization_openai -   ftfy or spacy is not installed using BERT BasicTokenizer instead of SpaCy & ftfy.
+03/12/2023 09:12:19 - INFO - pytorch_pretrained_bert.tokenization_openai -   Special tokens {'<POS>': 40478, '<NEG>': 40479, '<CON_START>': 40480, '<START>': 40481, '<END>': 40482, '<PAD>': 40483}
+03/12/2023 09:12:20 - INFO - pytorch_pretrained_bert.modeling_openai -   loading weights file openai-gpt/pytorch_model.bin
+03/12/2023 09:12:20 - INFO - pytorch_pretrained_bert.modeling_openai -   loading configuration file openai-gpt/config.json
+03/12/2023 09:12:20 - INFO - pytorch_pretrained_bert.modeling_openai -   Model config {
+  "afn": "gelu",
+  "architectures": [
+    "OpenAIGPTLMHeadModel"
+  ],
+  "attn_pdrop": 0.1,
+  "embd_pdrop": 0.1,
+  "initializer_range": 0.02,
+  "layer_norm_epsilon": 1e-05,
+  "model_type": "openai-gpt",
+  "n_ctx": 512,
+  "n_embd": 768,
+  "n_head": 12,
+  "n_layer": 12,
+  "n_positions": 512,
+  "n_special": 0,
+  "predict_special_tokens": true,
+  "resid_pdrop": 0.1,
+  "summary_activation": null,
+  "summary_first_dropout": 0.1,
+  "summary_proj_to_labels": true,
+  "summary_type": "cls_index",
+  "summary_use_proj": true,
+  "task_specific_params": {
+    "text-generation": {
+      "do_sample": true,
+      "max_length": 50
+    }
+  },
+  "vocab_size": 40478
+}
+
+[rank: 0] Global seed set to 44
+03/12/2023 09:12:24 - INFO - __main__ -   Will output inference predictions to /Midgard/home/martinig/thesis-src/jobs/gst/364600
+03/12/2023 09:12:24 - INFO - __main__ -   Predicted 0 sentences
+03/12/2023 09:12:28 - INFO - __main__ -   Predicted 1 sentences
+03/12/2023 09:12:30 - INFO - __main__ -   Predicted 2 sentences
+03/12/2023 09:12:31 - INFO - __main__ -   Predicted 3 sentences
+03/12/2023 09:12:33 - INFO - __main__ -   Predicted 4 sentences
+03/12/2023 09:12:36 - INFO - __main__ -   Predicted 5 sentences
+03/12/2023 09:12:37 - INFO - __main__ -   Predicted 6 sentences
+03/12/2023 09:12:41 - INFO - __main__ -   Predicted 7 sentences
+03/12/2023 09:12:43 - INFO - __main__ -   Predicted 8 sentences
+03/12/2023 09:12:46 - INFO - __main__ -   Predicted 9 sentences
+03/12/2023 09:12:47 - INFO - __main__ -   Predicted 10 sentences
+03/12/2023 09:12:49 - INFO - __main__ -   Predicted 11 sentences
+03/12/2023 09:12:51 - INFO - __main__ -   Predicted 12 sentences
+03/12/2023 09:12:54 - INFO - __main__ -   Predicted 13 sentences
+03/12/2023 09:12:58 - INFO - __main__ -   Predicted 14 sentences
+03/12/2023 09:13:00 - INFO - __main__ -   Predicted 15 sentences
+03/12/2023 09:13:03 - INFO - __main__ -   Predicted 16 sentences
+03/12/2023 09:13:05 - INFO - __main__ -   Predicted 17 sentences
+03/12/2023 09:13:07 - INFO - __main__ -   Predicted 18 sentences
+03/12/2023 09:13:10 - INFO - __main__ -   Predicted 19 sentences
+03/12/2023 09:13:12 - INFO - __main__ -   Predicted 20 sentences
+03/12/2023 09:13:14 - INFO - __main__ -   Predicted 21 sentences
+03/12/2023 09:13:16 - INFO - __main__ -   Predicted 22 sentences
+03/12/2023 09:13:17 - INFO - __main__ -   Predicted 23 sentences
+03/12/2023 09:13:18 - INFO - __main__ -   Predicted 24 sentences
+03/12/2023 09:13:21 - INFO - __main__ -   Predicted 25 sentences
+03/12/2023 09:13:22 - INFO - __main__ -   Predicted 26 sentences
+03/12/2023 09:13:25 - INFO - __main__ -   Predicted 27 sentences
+03/12/2023 09:13:26 - INFO - __main__ -   Predicted 28 sentences
+03/12/2023 09:13:27 - INFO - __main__ -   Predicted 29 sentences
+03/12/2023 09:13:30 - INFO - __main__ -   Predicted 30 sentences
+03/12/2023 09:13:30 - INFO - __main__ -   Predicted 31 sentences
+03/12/2023 09:13:31 - INFO - __main__ -   Predicted 32 sentences
+03/12/2023 09:13:33 - INFO - __main__ -   Predicted 33 sentences
+03/12/2023 09:13:36 - INFO - __main__ -   Predicted 34 sentences
+03/12/2023 09:13:39 - INFO - __main__ -   Predicted 35 sentences
+03/12/2023 09:13:42 - INFO - __main__ -   Predicted 36 sentences
+03/12/2023 09:13:45 - INFO - __main__ -   Predicted 37 sentences
+03/12/2023 09:13:47 - INFO - __main__ -   Predicted 38 sentences
+03/12/2023 09:13:50 - INFO - __main__ -   Predicted 39 sentences
+03/12/2023 09:13:52 - INFO - __main__ -   Predicted 40 sentences
+03/12/2023 09:13:54 - INFO - __main__ -   Predicted 41 sentences
+03/12/2023 09:13:56 - INFO - __main__ -   Predicted 42 sentences
+03/12/2023 09:13:59 - INFO - __main__ -   Predicted 43 sentences
+03/12/2023 09:14:03 - INFO - __main__ -   Predicted 44 sentences
+03/12/2023 09:14:05 - INFO - __main__ -   Predicted 45 sentences
+03/12/2023 09:14:06 - INFO - __main__ -   Predicted 46 sentences
+03/12/2023 09:14:08 - INFO - __main__ -   Predicted 47 sentences
+03/12/2023 09:14:09 - INFO - __main__ -   Predicted 48 sentences
+03/12/2023 09:14:11 - INFO - __main__ -   Predicted 49 sentences
+03/12/2023 09:14:14 - INFO - __main__ -   Predicted 50 sentences
+03/12/2023 09:14:17 - INFO - __main__ -   Predicted 51 sentences
+03/12/2023 09:14:19 - INFO - __main__ -   Predicted 52 sentences
+03/12/2023 09:14:21 - INFO - __main__ -   Predicted 53 sentences
+03/12/2023 09:14:23 - INFO - __main__ -   Predicted 54 sentences
+03/12/2023 09:14:26 - INFO - __main__ -   Predicted 55 sentences
+03/12/2023 09:14:27 - INFO - __main__ -   Predicted 56 sentences
+03/12/2023 09:14:28 - INFO - __main__ -   Predicted 57 sentences
+03/12/2023 09:14:30 - INFO - __main__ -   Predicted 58 sentences
+03/12/2023 09:14:32 - INFO - __main__ -   Predicted 59 sentences
+03/12/2023 09:14:34 - INFO - __main__ -   Predicted 60 sentences
+03/12/2023 09:14:36 - INFO - __main__ -   Predicted 61 sentences
+03/12/2023 09:14:39 - INFO - __main__ -   Predicted 62 sentences
+03/12/2023 09:14:41 - INFO - __main__ -   Predicted 63 sentences
+03/12/2023 09:14:43 - INFO - __main__ -   Predicted 64 sentences
+03/12/2023 09:14:44 - INFO - __main__ -   Predicted 65 sentences
+03/12/2023 09:14:46 - INFO - __main__ -   Predicted 66 sentences
+03/12/2023 09:14:48 - INFO - __main__ -   Predicted 67 sentences
+03/12/2023 09:14:50 - INFO - __main__ -   Predicted 68 sentences
+03/12/2023 09:14:51 - INFO - __main__ -   Predicted 69 sentences
+03/12/2023 09:14:52 - INFO - __main__ -   Predicted 70 sentences
+03/12/2023 09:14:54 - INFO - __main__ -   Predicted 71 sentences
+03/12/2023 09:14:56 - INFO - __main__ -   Predicted 72 sentences
+03/12/2023 09:14:59 - INFO - __main__ -   Predicted 73 sentences
+03/12/2023 09:15:00 - INFO - __main__ -   Predicted 74 sentences
+03/12/2023 09:15:02 - INFO - __main__ -   Predicted 75 sentences
+03/12/2023 09:15:05 - INFO - __main__ -   Predicted 76 sentences
+03/12/2023 09:15:07 - INFO - __main__ -   Predicted 77 sentences
+03/12/2023 09:15:08 - INFO - __main__ -   Predicted 78 sentences
+03/12/2023 09:15:09 - INFO - __main__ -   Predicted 79 sentences
+03/12/2023 09:15:12 - INFO - __main__ -   Predicted 80 sentences
+03/12/2023 09:15:13 - INFO - __main__ -   Predicted 81 sentences
+03/12/2023 09:15:16 - INFO - __main__ -   Predicted 82 sentences
+03/12/2023 09:15:19 - INFO - __main__ -   Predicted 83 sentences
+03/12/2023 09:15:20 - INFO - __main__ -   Predicted 84 sentences
+03/12/2023 09:15:21 - INFO - __main__ -   Predicted 85 sentences
+03/12/2023 09:15:23 - INFO - __main__ -   Predicted 86 sentences
+03/12/2023 09:15:25 - INFO - __main__ -   Predicted 87 sentences
+03/12/2023 09:15:26 - INFO - __main__ -   Predicted 88 sentences
+03/12/2023 09:15:27 - INFO - __main__ -   Predicted 89 sentences
+03/12/2023 09:15:28 - INFO - __main__ -   Predicted 90 sentences
+03/12/2023 09:15:30 - INFO - __main__ -   Predicted 91 sentences
+03/12/2023 09:15:31 - INFO - __main__ -   Predicted 92 sentences
+03/12/2023 09:15:34 - INFO - __main__ -   Predicted 93 sentences
+03/12/2023 09:15:35 - INFO - __main__ -   Predicted 94 sentences
+03/12/2023 09:15:37 - INFO - __main__ -   Predicted 95 sentences
+03/12/2023 09:15:39 - INFO - __main__ -   Predicted 96 sentences
+03/12/2023 09:15:42 - INFO - __main__ -   Predicted 97 sentences
+03/12/2023 09:15:43 - INFO - __main__ -   Predicted 98 sentences
+03/12/2023 09:15:43 - INFO - __main__ -   Predicted 99 sentences
+03/12/2023 09:15:46 - INFO - __main__ -   Predicted 100 sentences
+03/12/2023 09:15:48 - INFO - __main__ -   Predicted 101 sentences
+03/12/2023 09:15:49 - INFO - __main__ -   Predicted 102 sentences
+03/12/2023 09:15:50 - INFO - __main__ -   Predicted 103 sentences
+03/12/2023 09:15:51 - INFO - __main__ -   Predicted 104 sentences
+03/12/2023 09:15:52 - INFO - __main__ -   Predicted 105 sentences
+03/12/2023 09:15:54 - INFO - __main__ -   Predicted 106 sentences
+03/12/2023 09:15:56 - INFO - __main__ -   Predicted 107 sentences
+03/12/2023 09:15:58 - INFO - __main__ -   Predicted 108 sentences
+03/12/2023 09:16:00 - INFO - __main__ -   Predicted 109 sentences
+03/12/2023 09:16:01 - INFO - __main__ -   Predicted 110 sentences
+03/12/2023 09:16:03 - INFO - __main__ -   Predicted 111 sentences
+03/12/2023 09:16:04 - INFO - __main__ -   Predicted 112 sentences
+03/12/2023 09:16:05 - INFO - __main__ -   Predicted 113 sentences
+03/12/2023 09:16:07 - INFO - __main__ -   Predicted 114 sentences
+03/12/2023 09:16:08 - INFO - __main__ -   Predicted 115 sentences
+03/12/2023 09:16:10 - INFO - __main__ -   Predicted 116 sentences
+03/12/2023 09:16:12 - INFO - __main__ -   Predicted 117 sentences
+03/12/2023 09:16:16 - INFO - __main__ -   Predicted 118 sentences
+03/12/2023 09:16:19 - INFO - __main__ -   Predicted 119 sentences
+03/12/2023 09:16:22 - INFO - __main__ -   Predicted 120 sentences
+03/12/2023 09:16:25 - INFO - __main__ -   Predicted 121 sentences
+03/12/2023 09:16:26 - INFO - __main__ -   Predicted 122 sentences
+03/12/2023 09:16:28 - INFO - __main__ -   Predicted 123 sentences
+03/12/2023 09:16:30 - INFO - __main__ -   Predicted 124 sentences
+03/12/2023 09:16:32 - INFO - __main__ -   Predicted 125 sentences
+03/12/2023 09:16:33 - INFO - __main__ -   Predicted 126 sentences
+03/12/2023 09:16:36 - INFO - __main__ -   Predicted 127 sentences
+03/12/2023 09:16:39 - INFO - __main__ -   Predicted 128 sentences
+03/12/2023 09:16:43 - INFO - __main__ -   Predicted 129 sentences
+03/12/2023 09:16:45 - INFO - __main__ -   Predicted 130 sentences
+03/12/2023 09:16:46 - INFO - __main__ -   Predicted 131 sentences
+03/12/2023 09:16:49 - INFO - __main__ -   Predicted 132 sentences
+03/12/2023 09:16:51 - INFO - __main__ -   Predicted 133 sentences
+03/12/2023 09:16:54 - INFO - __main__ -   Predicted 134 sentences
+03/12/2023 09:16:57 - INFO - __main__ -   Predicted 135 sentences
+03/12/2023 09:17:00 - INFO - __main__ -   Predicted 136 sentences
+03/12/2023 09:17:02 - INFO - __main__ -   Predicted 137 sentences
+03/12/2023 09:17:03 - INFO - __main__ -   Predicted 138 sentences
+03/12/2023 09:17:05 - INFO - __main__ -   Predicted 139 sentences
+03/12/2023 09:17:06 - INFO - __main__ -   Predicted 140 sentences
+03/12/2023 09:17:08 - INFO - __main__ -   Predicted 141 sentences
+03/12/2023 09:17:10 - INFO - __main__ -   Predicted 142 sentences
+03/12/2023 09:17:12 - INFO - __main__ -   Predicted 143 sentences
+03/12/2023 09:17:13 - INFO - __main__ -   Predicted 144 sentences
+03/12/2023 09:17:15 - INFO - __main__ -   Predicted 145 sentences
+03/12/2023 09:17:17 - INFO - __main__ -   Predicted 146 sentences
+03/12/2023 09:17:18 - INFO - __main__ -   Predicted 147 sentences
+03/12/2023 09:17:20 - INFO - __main__ -   Predicted 148 sentences
+03/12/2023 09:17:21 - INFO - __main__ -   Predicted 149 sentences
+03/12/2023 09:17:23 - INFO - __main__ -   Predicted 150 sentences
+03/12/2023 09:17:24 - INFO - __main__ -   Predicted 151 sentences
+03/12/2023 09:17:26 - INFO - __main__ -   Predicted 152 sentences
+03/12/2023 09:17:27 - INFO - __main__ -   Predicted 153 sentences
+03/12/2023 09:17:28 - INFO - __main__ -   Predicted 154 sentences
+03/12/2023 09:17:30 - INFO - __main__ -   Predicted 155 sentences
+03/12/2023 09:17:31 - INFO - __main__ -   Predicted 156 sentences
+03/12/2023 09:17:34 - INFO - __main__ -   Predicted 157 sentences
+03/12/2023 09:17:36 - INFO - __main__ -   Predicted 158 sentences
+03/12/2023 09:17:36 - INFO - __main__ -   Predicted 159 sentences
+03/12/2023 09:17:38 - INFO - __main__ -   Predicted 160 sentences
+03/12/2023 09:17:41 - INFO - __main__ -   Predicted 161 sentences
+03/12/2023 09:17:44 - INFO - __main__ -   Predicted 162 sentences
+03/12/2023 09:17:47 - INFO - __main__ -   Predicted 163 sentences
+03/12/2023 09:17:50 - INFO - __main__ -   Predicted 164 sentences
+03/12/2023 09:17:53 - INFO - __main__ -   Predicted 165 sentences
+03/12/2023 09:17:55 - INFO - __main__ -   Predicted 166 sentences
+03/12/2023 09:17:58 - INFO - __main__ -   Predicted 167 sentences
+03/12/2023 09:18:00 - INFO - __main__ -   Predicted 168 sentences
+03/12/2023 09:18:02 - INFO - __main__ -   Predicted 169 sentences
+03/12/2023 09:18:03 - INFO - __main__ -   Predicted 170 sentences
+03/12/2023 09:18:04 - INFO - __main__ -   Predicted 171 sentences
+03/12/2023 09:18:08 - INFO - __main__ -   Predicted 172 sentences
+03/12/2023 09:18:09 - INFO - __main__ -   Predicted 173 sentences
+03/12/2023 09:18:10 - INFO - __main__ -   Predicted 174 sentences
+03/12/2023 09:18:11 - INFO - __main__ -   Predicted 175 sentences
+03/12/2023 09:18:14 - INFO - __main__ -   Predicted 176 sentences
+03/12/2023 09:18:17 - INFO - __main__ -   Predicted 177 sentences
+03/12/2023 09:18:19 - INFO - __main__ -   Predicted 178 sentences
+03/12/2023 09:18:20 - INFO - __main__ -   Predicted 179 sentences
+03/12/2023 09:18:22 - INFO - __main__ -   Predicted 180 sentences
+03/12/2023 09:18:24 - INFO - __main__ -   Predicted 181 sentences
+03/12/2023 09:18:26 - INFO - __main__ -   Predicted 182 sentences
+03/12/2023 09:18:28 - INFO - __main__ -   Predicted 183 sentences
+03/12/2023 09:18:30 - INFO - __main__ -   Predicted 184 sentences
+03/12/2023 09:18:32 - INFO - __main__ -   Predicted 185 sentences
+03/12/2023 09:18:35 - INFO - __main__ -   Predicted 186 sentences
+03/12/2023 09:18:40 - INFO - __main__ -   Predicted 187 sentences
+03/12/2023 09:18:42 - INFO - __main__ -   Predicted 188 sentences
+03/12/2023 09:18:44 - INFO - __main__ -   Predicted 189 sentences
+03/12/2023 09:18:45 - INFO - __main__ -   Predicted 190 sentences
+03/12/2023 09:18:46 - INFO - __main__ -   Predicted 191 sentences
+03/12/2023 09:18:50 - INFO - __main__ -   Predicted 192 sentences
+03/12/2023 09:18:52 - INFO - __main__ -   Predicted 193 sentences
+03/12/2023 09:18:53 - INFO - __main__ -   Predicted 194 sentences
+03/12/2023 09:18:56 - INFO - __main__ -   Predicted 195 sentences
+03/12/2023 09:18:58 - INFO - __main__ -   Predicted 196 sentences
+03/12/2023 09:19:00 - INFO - __main__ -   Predicted 197 sentences
+03/12/2023 09:19:03 - INFO - __main__ -   Predicted 198 sentences
+03/12/2023 09:19:05 - INFO - __main__ -   Predicted 199 sentences
+03/12/2023 09:19:08 - INFO - __main__ -   Predicted 200 sentences
+03/12/2023 09:19:10 - INFO - __main__ -   Predicted 201 sentences
+03/12/2023 09:19:13 - INFO - __main__ -   Predicted 202 sentences
+03/12/2023 09:19:15 - INFO - __main__ -   Predicted 203 sentences
+03/12/2023 09:19:18 - INFO - __main__ -   Predicted 204 sentences
+03/12/2023 09:19:20 - INFO - __main__ -   Predicted 205 sentences
+03/12/2023 09:19:22 - INFO - __main__ -   Predicted 206 sentences
+03/12/2023 09:19:23 - INFO - __main__ -   Predicted 207 sentences
+03/12/2023 09:19:24 - INFO - __main__ -   Predicted 208 sentences
+03/12/2023 09:19:28 - INFO - __main__ -   Predicted 209 sentences
+03/12/2023 09:19:30 - INFO - __main__ -   Predicted 210 sentences
+03/12/2023 09:19:31 - INFO - __main__ -   Predicted 211 sentences
+03/12/2023 09:19:33 - INFO - __main__ -   Predicted 212 sentences
+03/12/2023 09:19:36 - INFO - __main__ -   Predicted 213 sentences
+03/12/2023 09:19:39 - INFO - __main__ -   Predicted 214 sentences
+03/12/2023 09:19:41 - INFO - __main__ -   Predicted 215 sentences
+03/12/2023 09:19:44 - INFO - __main__ -   Predicted 216 sentences

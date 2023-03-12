@@ -1,0 +1,29 @@
+You have the following GPUs: [0]
+JOB:  364597
+TASK: 
+HOST: arwen
+
+Sat Mar 11 23:55:53 2023       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 525.85.05    Driver Version: 525.85.05    CUDA Version: 12.0     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA GeForce ...  On   | 00000000:39:00.0 Off |                  N/A |
+| 30%   26C    P8    26W / 320W |      1MiB / 10240MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+Traceback (most recent call last):
+  File "evaluation/metric.py", line 41, in <module>
+    with open(args.inputs, 'r') as input_file, open(args.preds, 'r') as preds_file:
+FileNotFoundError: [Errno 2] No such file or directory: '/Midgard/home/martinig/thesis-src/jobs/gst/364584/preds.txt'

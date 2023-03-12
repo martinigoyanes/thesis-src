@@ -100,7 +100,7 @@ class OriginalYelpDM(pl.LightningDataModule):
     
     @staticmethod
     def add_specific_args(parent_parser):
-        parser = parent_parser.add_argument_group("YelpDM")
+        parser = parent_parser.add_argument_group("OriginalYelpDM")
         parser.add_argument("--tokenizer_name_or_path", type=str, default='openai-gpt')
         parser.add_argument("--batch_size", type=int, default=32) # I made this up
         parser.add_argument("--max_seq_len", type=int, default=110) # From paper

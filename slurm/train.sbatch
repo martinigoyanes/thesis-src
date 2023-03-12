@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-#SBATCH --output=jobs/gst/training/%J_slurm.out
-#SBATCH --error=jobs/gst/training/%J_slurm.out
+#SBATCH --output=jobs/gst/train_%J_slurm.out
+#SBATCH --error=jobs/gst/train_%J_slurm.out
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=martinig@kth.se
-#SBATCH --constrain="rivendell"
+#SBATCH --constrain="arwen"
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=20GB
@@ -23,13 +23,19 @@ source "${HOME}/miniconda3/etc/profile.d/conda.sh"
 conda activate thesis-src
 
 
-JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/gst/training/${SLURM_JOB_ID}
+JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/gst/${SLURM_JOB_ID}
 mkdir -p $JOB_PATH
 
 BATCH_SIZE=8 # from gst paper
+ACCUMULATE_GRAD_BATCHES=4 # makes batchsize be 32
 PREPROCESS_KIND=bert_best_head_removal
-MODEL_NAME=BlindGST
-DATAMODULE_NAME=YelpDM
+MODEL_NAME=OriginalBlindGST
+DATAMODULE_NAME=OriginalYelpDM
+
+##### ARE YOU SURE TO TRAIN ON FULL DATASET ??? ######
+# TRAIN_DATA_PERCENT=0.3
+TRAIN_DATA_PERCENT=1.0
+##### ARE YOU SURE TO TRAIN ON FULL DATASET ??? ######
 
 export TRANSFORMERS_OFFLINE=1
-python code/train.py --batch_size $BATCH_SIZE --datamodule_name $DATAMODULE_NAME --model_name $MODEL_NAME --default_root_dir $JOB_PATH --preprocess_kind $PREPROCESS_KIND
+python code/train.py --batch_size $BATCH_SIZE --datamodule_name $DATAMODULE_NAME --model_name $MODEL_NAME --default_root_dir $JOB_PATH --preprocess_kind $PREPROCESS_KIND --limit_train_batches $TRAIN_DATA_PERCENT --accumulate_grad_batches $ACCUMULATE_GRAD_BATCHES

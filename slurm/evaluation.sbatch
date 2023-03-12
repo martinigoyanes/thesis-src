@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-#SBATCH --output=jobs/bart-detox/evaluation/%J_slurm.out
-#SBATCH --error=jobs/bart-detox/evaluation/%J_slurm.out
+#SBATCH --output=jobs/gst/evaluation_%J_slurm.out
+#SBATCH --error=jobs/gst/evaluation_%J_slurm.out
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=martinig@kth.se
-#SBATCH --constrain="rivendell"
+#SBATCH --constrain="arwen"
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=20GB
@@ -23,15 +23,14 @@ source "${HOME}/miniconda3/etc/profile.d/conda.sh"
 conda activate thesis-src
 
 
-JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/bart-detox/evaluation/${SLURM_JOB_ID}
-mkdir -p $JOB_PATH
+JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/gst/364584/lightning_logs/version_364584
 # use references as input
-# INPUT_PATH=/Midgard/home/martinig/thesis-src/data/paradetox/test_toxic_refs.txt
+INPUT_PATH=/Midgard/home/martinig/thesis-src/data/yelp/bert_best_head_removal/reference.0.out
 # use orignial as input
-INPUT_PATH=/Midgard/home/martinig/thesis-src/data/paradetox/test_toxic.txt
+# INPUT_PATH=/Midgard/home/martinig/thesis-src/data/yelp/test_toxic.txt
 
 BATCH_SIZE=32
+TASK_NAME=yelp
 
 export TRANSFORMERS_OFFLINE=1
-python code/inference.py --batch_size $BATCH_SIZE --out_dir $JOB_PATH
-python evaluation/metric.py  --inputs $INPUT_PATH --preds "$JOB_PATH/preds.txt" --batch_size 32 --out_dir $JOB_PATH
+python evaluation/metric.py  --inputs $INPUT_PATH --preds "$JOB_PATH/preds.txt" --batch_size 32 --out_dir $JOB_PATH --task_name $TASK_NAME

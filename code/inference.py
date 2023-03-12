@@ -55,6 +55,7 @@ def predict(texts, beam_width=3, vocab_length=40483, tokenizer=None, device=None
         beam_indexes = [[] for i in range(beam_width)] # indexes of the current decoded beams
         best_scoes = [0 for i in range(beam_width)] # A list of lists to store Probability values of each decoded token of best beams
         count = 0
+        logger.info(f"Predicted {len(pred_ids)} sentences")
         while count < model.config.n_positions and not stop_decode:
             if count == 0: # For the first step when only one sentence is availabe
                 with torch.no_grad():
@@ -102,8 +103,7 @@ def predict(texts, beam_width=3, vocab_length=40483, tokenizer=None, device=None
                 beam_indexes = temp_lt
                 del temp_lt
                 count += 1
-                # if current_state.size(1) >= 512:
-                if current_state.size(1) >= 50:
+                if current_state.size(1) >= 128:
                     break
     
         pred_ids += beam_indexes
@@ -147,6 +147,7 @@ def main(args):
     # )
 
     # preds = trainer.predict(model=model, datamodule=dm)
+    logger.info(f"Will output inference predictions to {dm.hparams.default_root_dir}")
     dm.setup(stage='predict')
     preds = predict(dm.datasets['test'], beam_width=1, vocab_length=40483, tokenizer=dm.tokenizer, device=model.device, model=model.model)
     save_preds(preds=preds, out_dir=dm.hparams.default_root_dir, tokenizer=dm.tokenizer)
@@ -159,15 +160,12 @@ if __name__ == "__main__":
     parser = pl.Trainer.add_argparse_args(parser)
 
     # figure out which model to use
-    ckpt_root_dir = '/home/martin/Documents/Education/Master/thesis/project/thesis-src/code'
-    ckpt_path = f'{ckpt_root_dir}/lightning_logs/version_0/checkpoints/epoch=0-step=4.ckpt'
     # parser.add_argument("--model_name", type=str, default="BlindGST", help="BlindGST")
     parser.add_argument("--model_name", type=str, default="OriginalBlindGST", help="OriginalBlindGST")
     # parser.add_argument("--datamodule_name", type=str, default="YelpDM", help="YelpDM")
     parser.add_argument("--datamodule_name", type=str, default="OriginalYelpDM", help="OriginalYelpDM")
     parser.add_argument("--preprocess_kind", type=str, default="bert_best_head_removal", help="Kind of preprocessing of data:\n - bert_best_head_removal")
-    parser.add_argument("--checkpoint_path", type=str, default=ckpt_path, help="Path to checkpoint from trainer.fit()")
-    # parser.add_argument("--default_root_dir", type=str, default=ckpt_root_dir, help="Directory to store run logs and ckpts")
+    parser.add_argument("--checkpoint_path", type=str, required=True, help="Path to checkpoint from trainer.fit()")
 
 
     # THIS LINE IS KEY TO PULL THE MODEL NAME
