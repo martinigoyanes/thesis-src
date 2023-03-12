@@ -59,8 +59,8 @@ def main(args):
         devices=1 if torch.cuda.is_available() else None,  # limiting got iPython runs
         # fast_dev_run=True,
         # deterministic=True,
-        limit_train_batches=10,
-        limit_val_batches=10,
+        # limit_train_batches=10,
+        # limit_val_batches=10,
         # profiler="advanced",
     )
     trainer.fit(model, datamodule=dm)

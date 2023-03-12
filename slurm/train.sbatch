@@ -26,11 +26,11 @@ conda activate thesis-src
 JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/gst/${SLURM_JOB_ID}
 mkdir -p $JOB_PATH
 
-BATCH_SIZE=8 # from gst paper
-ACCUMULATE_GRAD_BATCHES=4 # makes batchsize be 32
-PREPROCESS_KIND=bert_best_head_removal
-MODEL_NAME=OriginalBlindGST
-DATAMODULE_NAME=OriginalYelpDM
+BATCH_SIZE=32 # from gst paper
+ACCUMULATE_GRAD_BATCHES=1 # makes batchsize be 32
+PREPROCESS_KIND=original
+MODEL_NAME=SentimentRoBERTa
+DATAMODULE_NAME=YelpDM2
 
 ##### ARE YOU SURE TO TRAIN ON FULL DATASET ??? ######
 # TRAIN_DATA_PERCENT=0.3
