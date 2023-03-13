@@ -111,8 +111,8 @@ class OriginalJigsawDM(pl.LightningDataModule):
     def add_specific_args(parent_parser):
         parser = parent_parser.add_argument_group("OriginalJigsawDM")
         parser.add_argument("--tokenizer_name_or_path", type=str, default='openai-gpt')
-        parser.add_argument("--batch_size", type=int, default=32) # I made this up
-        parser.add_argument("--max_seq_len", type=int, default=128) # I made this one up
+        parser.add_argument("--batch_size", type=int, default=4) # I made this up
+        parser.add_argument("--max_seq_len", type=int, default=300) # Calculated it. Real max_len=266. But use round number -> 300
         return parent_parser
 
     def prepare_data(self):
@@ -126,8 +126,8 @@ class OriginalJigsawDM(pl.LightningDataModule):
 
     def setup(self, stage: Optional[str]):
         if stage == "fit":
-            self.datasets['train'] = OriginalJigsawDataset(split='train', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
-            self.datasets['dev'] = OriginalJigsawDataset(split='dev', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
+            self.datasets['train'] = OriginalJigsawDataset(split='train', tokenizer=self.tokenizer, max_seq_len=self.max_seq_len,preprocess_kind=self.preprocess_kind)
+            self.datasets['dev'] = OriginalJigsawDataset(split='dev', tokenizer=self.tokenizer, max_seq_len=self.max_seq_len,preprocess_kind=self.preprocess_kind)
         if stage == "predict":
             self.datasets['test'] = OriginalJigsawDataset(split='test', tokenizer=self.tokenizer, preprocess_kind=self.preprocess_kind)
     
@@ -166,7 +166,7 @@ class OriginalYelpDM(pl.LightningDataModule):
         parser = parent_parser.add_argument_group("OriginalYelpDM")
         parser.add_argument("--tokenizer_name_or_path", type=str, default='openai-gpt')
         parser.add_argument("--batch_size", type=int, default=32) # I made this up
-        parser.add_argument("--max_seq_len", type=int, default=110) # From paper
+        parser.add_argument("--max_seq_len", type=int, default=128) # I made this one up
         return parent_parser
 
     def prepare_data(self):
@@ -249,11 +249,11 @@ class YelpDM2(pl.LightningDataModule):
 
 if __name__ == "__main__":
 
-    dm = YelpDM2(
-        tokenizer_name_or_path='roberta-base',
-        max_seq_len=110,
+    dm = OriginalJigsawDM(
+        tokenizer_name_or_path='openai-gpt',
+        max_seq_len=300, # Real max_len = 266 ---> 300
         batch_size=32,
-        preprocess_kind='original'
+        preprocess_kind='bert_best_head_removal'
     )
 
     dm.setup(stage="fit")

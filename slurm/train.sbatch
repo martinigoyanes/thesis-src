@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-#SBATCH --output=jobs/sentimentRoBERTa/train_%J_slurm.out
-#SBATCH --error=jobs/sentimentRoBERTa/train_%J_slurm.out
+#SBATCH --output=jobs/gst/train_%J_slurm.out
+#SBATCH --error=jobs/gst/train_%J_slurm.out
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=martinig@kth.se
 #SBATCH --constrain="arwen"
@@ -23,15 +23,15 @@ source "${HOME}/miniconda3/etc/profile.d/conda.sh"
 conda activate thesis-src
 
 
-JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/sentimentRoBERTa/${SLURM_JOB_ID}
+JOB_PATH=/Midgard/home/martinig/thesis-src/jobs/gst/${SLURM_JOB_ID}
 mkdir -p $JOB_PATH
 
-BATCH_SIZE=32 # from gst paper
-ACCUMULATE_GRAD_BATCHES=8 # makes batchsize be 256
-PREPROCESS_KIND=original
-MODEL_NAME=SentimentRoBERTa
-DATAMODULE_NAME=YelpDM2
-MAX_EPOCHS=2
+BATCH_SIZE=8 # from gst paper
+ACCUMULATE_GRAD_BATCHES=4 # makes batchsize be 32
+PREPROCESS_KIND=bert_best_head_removal
+MODEL_NAME=OriginalBlindGST
+DATAMODULE_NAME=OriginalJigsawDM
+MAX_EPOCHS=1
 
 ##### ARE YOU SURE TO TRAIN ON FULL DATASET ??? ######
 # TRAIN_DATA_PERCENT=0.3

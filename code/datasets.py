@@ -130,8 +130,8 @@ class OriginalJigsawDataset(Dataset):
         self.split = split
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len if max_seq_len else None
-        # self.data_dir = f'/Midgard/home/martinig/thesis-src/data/jigsaw/{self.preprocess_kind}'
-        self.data_dir = f'/home/martin/Documents/Education/Master/thesis/project/thesis-src/data/jigsaw/{self.preprocess_kind}'
+        self.data_dir = f'/Midgard/home/martinig/thesis-src/data/jigsaw/{self.preprocess_kind}'
+        # self.data_dir = f'/home/martin/Documents/Education/Master/thesis/project/thesis-src/data/jigsaw/{self.preprocess_kind}'
         self.cache_dir = f'{self.data_dir}/.cache'
         self.prepare_data = prepare_data
         self._setup()
@@ -397,7 +397,7 @@ if __name__ == "__main__":
         split='train', 
         tokenizer=tokenizer, 
         preprocess_kind='bert_best_head_removal', 
-        max_seq_len=128, 
+        max_seq_len=300, # Real max_len = 266 ---> 300
         prepare_data=True
     )
 

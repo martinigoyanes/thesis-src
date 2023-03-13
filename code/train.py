@@ -5,6 +5,7 @@ from pytorch_lightning.profilers import SimpleProfiler, AdvancedProfiler
 from data_modules import YelpDM
 from data_modules import YelpDM2
 from data_modules import OriginalYelpDM
+from data_modules import OriginalJigsawDM
 from models import BlindGST
 from models import OriginalBlindGST
 from models import SentimentRoBERTa
@@ -16,8 +17,13 @@ logger = logging.getLogger(__name__)
     # Uncomment line to save model when I stop using pytorch_bert
     # load_from_checkpoint() does not load tokenizer, neither it gets saved
 # TODO: Load fine-tuned tokenizer and model -> 
+    # Cant do the above when using pytorch_pretrained_bert
+
 # TODO: Lm_labels start after <START> (dont include it)
+    # When I use HF models
+
 # TODO: Use all data
+    # Just a reminder to use all data when training for real
 
 def main(args):
 
@@ -37,6 +43,8 @@ def main(args):
         dm = YelpDM2(**dict_args)
     if args.datamodule_name == "OriginalYelpDM":
         dm = OriginalYelpDM(**dict_args)
+    if args.datamodule_name == "OriginalJigsawDM":
+        dm = OriginalJigsawDM(**dict_args)
     # pick model
     if args.model_name == "BlindGST":
         model = BlindGST(num_special_tokens=len(dm.special_tokens), **dict_args)
@@ -58,18 +66,19 @@ def main(args):
         devices=1 if torch.cuda.is_available() else None,  # limiting got iPython runs
         # fast_dev_run=True,
         # deterministic=True,
-        # limit_train_batches=100,
-        # limit_val_batches=10,
+        # limit_train_batches=4,
+        # limit_val_batches=2,
+        # max_epochs=1,
         # profiler="advanced",
     )
     trainer.fit(model, datamodule=dm)
 
     # Check if model has a test_step defined
-    if callable(getattr(model, "test_step", None)):
-        logger.info(f"Will test model {model.hparams.model_name}")
-        trainer.test(model, datamodule=dm)
-    else:
-        logger.info(f"Will NOT test model {model.hparams.model_name}")
+    # if callable(getattr(model, "test_step", None)):
+    #     logger.info(f"Will test model {model.hparams.model_name}")
+    #     trainer.test(model, datamodule=dm)
+    # else:
+    #     logger.info(f"Will NOT test model {model.hparams.model_name}")
 
 
 
@@ -82,13 +91,14 @@ if __name__ == "__main__":
 
     # figure out which model to use
     # parser.add_argument("--model_name", type=str, default="BlindGST", help="BlindGST")
-    # parser.add_argument("--model_name", type=str, default="OriginalBlindGST", help="OriginalBlindGST")
-    parser.add_argument("--model_name", type=str, default="SentimentRoBERTa", help="SentimentRoBERTa")
+    parser.add_argument("--model_name", type=str, default="OriginalBlindGST", help="OriginalBlindGST")
+    # parser.add_argument("--model_name", type=str, default="SentimentRoBERTa", help="SentimentRoBERTa")
     # parser.add_argument("--datamodule_name", type=str, default="YelpDM", help="YelpDM")
     # parser.add_argument("--datamodule_name", type=str, default="OriginalYelpDM", help="OriginalYelpDM")
-    parser.add_argument("--datamodule_name", type=str, default="YelpDM2", help="YelpDM2")
-    # parser.add_argument("--preprocess_kind", type=str, default="bert_best_head_removal", help="Kind of preprocessing of data:\n - bert_best_head_removal\n - original")
-    parser.add_argument("--preprocess_kind", type=str, default="original", help="Kind of preprocessing of data:\n - bert_best_head_removal\n - original")
+    parser.add_argument("--datamodule_name", type=str, default="OriginalJigsawDM", help="OriginalJigsawDM")
+    # parser.add_argument("--datamodule_name", type=str, default="YelpDM2", help="YelpDM2")
+    parser.add_argument("--preprocess_kind", type=str, default="bert_best_head_removal", help="Kind of preprocessing of data:\n - bert_best_head_removal\n - original")
+    # parser.add_argument("--preprocess_kind", type=str, default="original", help="Kind of preprocessing of data:\n - bert_best_head_removal\n - original")
     parser.add_argument("--default_root_dir", type=str, default=".", help="Directory to store run logs and ckpts")
 
 
@@ -105,6 +115,8 @@ if __name__ == "__main__":
     # let the datamodule add what it wants
     if temp_args.datamodule_name == "OriginalYelpDM":
         parser = OriginalYelpDM.add_specific_args(parser)
+    if temp_args.datamodule_name == "OriginalJigsawDM":
+        parser = OriginalJigsawDM.add_specific_args(parser)
     if temp_args.datamodule_name == "YelpDM":
         parser = YelpDM.add_specific_args(parser)
     if temp_args.datamodule_name == "YelpDM2":

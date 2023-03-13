@@ -328,33 +328,31 @@ class SentimentRoBERTa(pl.LightningModule):
             f.write(labels_txt)
 
 if __name__ == "__main__":
-    from data_modules import YelpDM2
+    from data_modules import OriginalJigsawDM
 
-    dm = YelpDM2(
-        tokenizer_name_or_path='roberta-base',
-        max_seq_len=110,
+    dm = OriginalJigsawDM(
+        tokenizer_name_or_path='openai-gpt',
+        max_seq_len=300, # Real max_len = 266 ----> 300
         batch_size=32,
-        preprocess_kind='original'
+        preprocess_kind='bert_best_head_removal'
     )
     dm.setup(stage="fit")
 
-    model = SentimentRoBERTa(
-        model_name_or_path='roberta-base'
+    model = OriginalBlindGST(
+        model_name_or_path='openai-gpt',
+        num_special_tokens=len(dm.special_tokens),
+        batch_size=dm.batch_size
     )
 
     batch = dm.datasets['train'][:5]
 
-    output = model(
-        input_ids=batch['input_ids'], 
-        attention_mask=batch['attention_mask'], 
-        labels=batch['labels'], 
-        return_dict=True
-    )
+    loss = model(batch['input_ids'], lm_labels=batch['lm_labels'])
 
-    probs = torch.sigmoid(output.logits)
-    preds = torch.argmax(probs, dim=1)
+    # For classifiers
+    # probs = torch.sigmoid(output.logits)
+    # preds = torch.argmax(probs, dim=1)
 
-    from sklearn.metrics import precision_recall_fscore_support
-    precision, recall, fscore, support = precision_recall_fscore_support(y_true=batch['labels'], y_pred=preds, average='binary')
+    # from sklearn.metrics import precision_recall_fscore_support
+    # precision, recall, fscore, support = precision_recall_fscore_support(y_true=batch['labels'], y_pred=preds, average='binary')
 
-    print(precision)
+    # print(precision)
